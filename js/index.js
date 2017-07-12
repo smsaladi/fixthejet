@@ -26,13 +26,21 @@ function jet_to_val(r, g, b) {
 
     if (g == 0 && r == 0) {
       return b/4 - 1/8;
-    } else if (b == 1 && r == 0) {
+    } else if (b == 1) {
+      if (r != 0) {
+        return -1;
+      }
       return g/4 + 1/8;
     } else if (g == 1) {
-      return r/4 + 3/8;       // or -b/4 + 5/8
-    } else if (r == 1 && b == 0) {
+      return r/4 + 3/8;
+    } else if (r == 1) {
+        if (b != 0) {
+          return -1;
+        }
       return -g/4 + 7/8;
     } else if (g == 0 && b == 0) {
       return -r/4 + 9/8;
+    } else {
+      return -1;
     }
 }
