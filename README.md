@@ -2,7 +2,11 @@ README
 ======
 
 The starts of a conversion utility to take a jet-colored plot
-and recolor it to a better colormap.
+and recolor it to a better colormap. To test this out, start a webserver and then open `index.html`:
+
+1. [Start webserver](https://stackoverflow.com/a/21608670/2320823): `python -m http.server`
+
+2. Go to [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 Some code:
 ```python
