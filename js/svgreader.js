@@ -6,8 +6,8 @@ var viridis = ["#440154","#440256","#450457","#450559","#46075a","#46085c","#460
 
 
 window.onload = function(){
-    alert("Window loading");
-    var svg = document.getElementById('svgtest');
+  var object = document.getElementById("svgtest");
+    var svg = object.contentDocument;
     var elements = svg.getElementsByTagName('*');
     alert(elements.length);
     //alert(elements.length + "");
