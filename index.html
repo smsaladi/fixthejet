@@ -9,54 +9,49 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/dropzone.css" integrity="sha256-0Z6mOrdLEtgqvj7tidYQnCYWG3G2GAIpatAWKhDx+VM=" crossorigin="anonymous" />
+
   <link rel="stylesheet" type="text/css"
       href="css/main.css"/>
 
 </head>
 
 <body>
-  <!-- Learn about this code on MDN: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas -->
 
-<!-- <canvas id="canvas" width="1000" height="338" style="float:left"></canvas> -->
-
-
-
-<!-- ***********************************************************
-***********************************************************
-*********************************************************** -->
 <div class="container">
-
   <div class="starter-template">
     <h1>Bootstrap starter template</h1>
     <p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
   </div>
-
 </div>
 
 
-<object id="svgtest" type="image/svg+xml" data="random2d.svg" >
 
-</object>
-
-
-<!-- ***********************************************************
-***********************************************************
-*********************************************************** -->
-<!-- <form action="/file-upload"
-      class="dropzone"
-      id="my-awesome-dropzone"></form> -->
-
-      <!-- Latest compiled and minified CSS -->
-
+<object id="svgtest" type="image/svg+xml" data="random2d.svg" ></object>
+<div id="dropzone">
+<form action="/upload" class="dropzone needsclick dz-clickable" id="demo-upload">
+  <div class="dz-message needsclick">
+      "Drop SVG Files Here or Click to Upload"
+      <br>
+      <span class="note needsclick">
+        "Only SVG filetypes are accepted. Rasterized img filetypes coming soon."
+      </span>
+  </div>
+</form>
+</div>
 
 <button class="btn btn-success"> Click me! </button>
+
+
 <script src="js/svgreader.js"></script>
 <script type='text/javascript' src='js/svgreader.js?filever=<?=filesize('js/svgreader.js')?>'></script>
 <!-- <script src="js/dropzone.js"></script>
 <script type='text/javascript' src='js/dropzone.js?filever=<?=filesize('js/dropzone.js')?>'></script> -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/dropzone.js" integrity="sha256-Xb32jEsNZ5ojqwCeQBgl/4fMDIUCO9Sdws7xiMT3TaQ=" crossorigin="anonymous"></script>
+
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/dropzone.js" integrity="sha256-Xb32jEsNZ5ojqwCeQBgl/4fMDIUCO9Sdws7xiMT3TaQ=" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </body>
 </html>
