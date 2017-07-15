@@ -61,7 +61,8 @@ window.onload = function(){
            elements[i].style.fill = viridisColor;
          }
      }
-     alert("Click to change to viridis");
+     const scale = require('scale-color-perceptual');
+     alert(scale.viridis(t));
 };
 
 //
