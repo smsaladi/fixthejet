@@ -13,23 +13,25 @@
 
   <link rel="stylesheet" type="text/css"
       href="css/main.css"/>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/dropzone.js" integrity="sha256-Xb32jEsNZ5ojqwCeQBgl/4fMDIUCO9Sdws7xiMT3TaQ=" crossorigin="anonymous"></script>
 </head>
 
 <body>
 
 <div class="container">
   <div class="starter-template">
-    <h1>Bootstrap starter template</h1>
-    <p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
+    <h1>Online Colormap Converter</h1>
+    <p class="lead">Seamless web application for converting from Jet to Viridis</p>
   </div>
-</div>
 
 
 
-<object id="svgtest" type="image/svg+xml" data="random2d.svg" ></object>
-<div id="dropzone">
-<form action="/upload" class="dropzone needsclick dz-clickable" id="demo-upload">
+
+
+
+<div class="col-lg-6">
+<form action="/" method="post" enctype="multipart/form-data" class="dropzone" id="demoUpload">
   <div class="dz-message needsclick">
       "Drop SVG Files Here or Click to Upload"
       <br>
@@ -37,21 +39,67 @@
         "Only SVG filetypes are accepted. Rasterized img filetypes coming soon."
       </span>
   </div>
+  <div class="fallback">
+    <input name="file" type="file" />
+  </div>
 </form>
 </div>
-
-<button class="btn btn-success"> Click me! </button>
-
-
+<div class="col-lg-6">
+<object id="svgtest"  type="image/svg+xml" data="random2d.svg" ></object>
+</div>
+<button id="convert-btn" class="btn btn-success"> Click me! </button>
+</div>
 <script src="js/svgreader.js"></script>
-<script type='text/javascript' src='js/svgreader.js?filever=<?=filesize('js/svgreader.js')?>'></script>
-<!-- <script src="js/dropzone.js"></script>
-<script type='text/javascript' src='js/dropzone.js?filever=<?=filesize('js/dropzone.js')?>'></script> -->
 
 
 
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/dropzone.js" integrity="sha256-Xb32jEsNZ5ojqwCeQBgl/4fMDIUCO9Sdws7xiMT3TaQ=" crossorigin="anonymous"></script>
+
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </body>
 </html>
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>IndexStackOverflow101</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/dropzone.css" integrity="sha256-0Z6mOrdLEtgqvj7tidYQnCYWG3G2GAIpatAWKhDx+VM=" crossorigin="anonymous" />
+    <style type="text/css">
+        .dropzone {
+            border: 2px dashed #0087F7;
+            border-radius: 5px;
+            background: white;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/dropzone.js" integrity="sha256-Xb32jEsNZ5ojqwCeQBgl/4fMDIUCO9Sdws7xiMT3TaQ=" crossorigin="anonymous"></script>
+</head>
+<body>
+    <form action="/" class="dropzone" enctype="multipart/form-data" id="demoUpload" method="post">
+        <div class="dz-message needsclick">
+            "Drop SVG Files Here or Click to Upload"
+            <br>
+            <span class="note needsclick">
+                "Only SVG filetypes are accepted. Rasterized img filetypes coming soon."
+            </span>
+        </div>
+    </form>
+    <script type="text/javascript">
+        //document.addEventListener("DOMContentLoaded", function () {
+            //YOU have a dash in the form id, please change it
+            Dropzone.options.demoUpload = {
+                paramName: "file", // The name that will be used to transfer the file
+                maxFilesize: 1000, // MB'
+                maxFiles: 1,
+                timeout: 3000000,
+                createImageThumbnails: false,
+
+                init: function () {
+                    this.on("addedfile", function (file) { alert("File added."); });
+                }
+            };
+      //  });
+    </script>
+</body>
+</html> -->
