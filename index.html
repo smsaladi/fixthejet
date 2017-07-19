@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <meta name="robots" content="noindex">
 
@@ -20,7 +20,7 @@
   <div class="container">
     <div class="starter-template">
       <h1>Online Colormap Converter</h1>
-      <p class="lead">Seamless web application for converting from Jet to Viridis</p>
+      <h6 class="lead">Seamless web application for converting from Jet to Viridis</h6>
     </div>
 
 
@@ -29,26 +29,24 @@
 
 
     <div class="upload-drop-zone" id="drop-zone">
-      Just drag and drop files here
+      <label id="to-click" for="files" class="input-label">
+        Drag and Drop Files Here or Click to Browse <!-- Replace with whatever text or icon you wish to use -->
+        <input type="file" id="files" name="files[]" multiple />
+        <output id="list"></output>
+      </label>
     </div>
 
-    <!-- Progress Bar -->
-    <!-- <div class="progress">
-    <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
-    <span class="sr-only">60% Complete</span>
-  </div>
-</div> -->
-
-<form action="" method="post" enctype="multipart/form-data" id="js-upload-form">
-  <div class="form-inline">
+    <!-- <form action="" method="post" enctype="multipart/form-data" id="js-upload-form">
+    <div class="form-inline">
     <div class="form-group">
-      <input type="file" id="files" name="files[]" multiple />
-      <output id="list"></output>
-    </div>
-    <!-- <button type="submit" class="btn btn-sm btn-primary" id="js-upload-submit">Upload files</button> -->
-
+    <input type="file" id="files1" name="files[]" multiple />
+    <output id="list1"></output>
   </div>
-</form>
+
+</div>
+</form> -->
+
+
 <button id="convert-btn" class="btn btn-success" onClick="convert()"> Convert </button>
 <button id="download-btn" class="btn btn-info" onClick="download()"> Download </button>
 </div>
