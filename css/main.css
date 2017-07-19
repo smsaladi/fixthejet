@@ -1,19 +1,33 @@
-.dropzone {
-    border: 2px dashed #0087F7;
-    border-radius: 5px;
-    background: white;
+.upload-drop-zone {
+  height: 200px;
+  border-width: 2px;
+  margin-bottom: 20px;
+}
+
+/* skin.css Style*/
+.upload-drop-zone {
+  color: #c0c0c0;
+  border-style: dashed;
+  border-color: #c0c0c0;
+  line-height: 200px;
+  text-align: center
+}
+.upload-drop-zone.drop {
+  color: #b2b2ff;
+  border-color: #b2b2ff;
 }
 
 body {
-    background-color: lightblue;
+    background-color: #424242;
 }
 
 h1 {
-    color: white;
+    color: #E1E1E1;
     text-align: center;
 }
 
 p {
     font-family: verdana;
     font-size: 20px;
+    color: #C1C1C1;
 }

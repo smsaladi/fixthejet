@@ -4,11 +4,17 @@ var viridis =  ["#440154","#440256","#450457","#450559","#46075a","#46085c","#46
 
 
 //**********FILE INPUT METHODS***********************
-function handleFileSelect(evt) {
-  var files = evt.target.files; // FileList object
+function handleFileSelect(evt, isDrop) {
+  alert(isDrop);
+  var files;
+  if (isDrop) {
+    files = evt.dataTransfer.files; // FileList object
+  } else {
+    files = evt.target.files;
+  }
   var uploadedID = '"uploaded"';
   // Loop through the FileList and render image files as thumbnails.
-  for (var i = 0, f; f = files[i]; i++) {
+  for (var i = 0, f=files[i]; i < files.length; i++) {
 
     // Only process image files.
     if (!f.type.match('image.*')) {
@@ -22,7 +28,7 @@ function handleFileSelect(evt) {
       return function(e) {
         // Render thumbnail
         //console.log(escape(f.name));
-        console.log(e.target.result);
+        //console.log(e.target.result);
         var data = e.target.result;
         var obj = document.createElement('div');
         obj.setAttribute('id', 'image-container');
@@ -45,30 +51,45 @@ var addSVGID = function(data, id) {
   return newData;
 };
 
-document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
 var uploadForm = document.getElementById('js-upload-form');
-// var dropZone = document.getElementById('drop-zone');
-//
-var startUpload = function(files) {
+document.getElementById('files').addEventListener('change', handleFileSelect, false);
+var dropZone = document.getElementById('drop-zone');
 
-  var fileReader = new FileReader();
-  console.log(fileReader.readAsText(files[0]));
 
+
+dropZone.ondrop = function(evt) {
+  evt.stopPropagation();
+  evt.preventDefault();
+  evt.dataTransfer.dropEffect = 'copy';
+  this.className = 'upload-drop-zone';
+
+  //startUpload(e.dataTransfer.files);
+  handleFileSelect(evt, true);
+
+};
+
+dropZone.ondragover = function() {
+  this.className = 'upload-drop-zone drop';
+  return false;
+};
+
+dropZone.ondragleave = function() {
+  this.className = 'upload-drop-zone';
+  return false;
 };
 
 uploadForm.addEventListener('submit', function(e) {
   var uploadFiles = document.getElementById('js-upload-files').files;
   e.preventDefault();
 
-  startUpload(uploadFiles);
+  //startUpload(uploadFiles);
 });
 
 //************DOWNLOAD METHODS***********************
 function download() {
   var filename = "converted";
   var data = document.getElementById('image-container').innerHTML;
-  alert(data.slice(0,250));
   var type = "image/svg+xml"; //TODO: Implement getType() method that gets proper type
   var file = new Blob([data], {type: type});
 
