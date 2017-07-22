@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <meta name="robots" content="noindex">
+    <meta name="robots" content="noindex">
 
-  <title>A color picker</title>
+    <title>A color picker</title>
 
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="css/main.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
 
 </head>
 
@@ -28,55 +29,30 @@
     <style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}
     </style>
 
-  <div class="container">
-    <div class="starter-template">
-      <h1>Online Colormap Converter</h1>
-      <h6 class="lead">Seamless web application for converting from Jet to Viridis</h6>
-    </div>
+    <div class="container">
+        <div class="starter-template">
+            <h1>Online Colormap Converter</h1>
+            <h6 class="lead">Seamless web application for converting from Jet to Viridis</h6>
+        </div>
 
 
-
-
-
-
-    <div class="upload-drop-zone" id="drop-zone">
-      <label id="to-click" for="files" class="input-label">
-        Drag and Drop Files Here or Click to Browse <!-- Replace with whatever text or icon you wish to use -->
+        <div class="upload-drop-zone" id="drop-zone">
+            <label id="to-click" for="files" class="input-label">
+        Drag and Drop Files Here or Click to Browse
         <input type="file" id="files" name="files[]" multiple />
         <output id="list"></output>
       </label>
+        </div>
+
+
+        <button id="convert-btn" class="btn btn-success" onClick="convert()"> Convert </button>
+        <button id="download-btn" class="btn btn-info" onClick="download()"> Download </button>
     </div>
 
-    <!-- <form action="" method="post" enctype="multipart/form-data" id="js-upload-form">
-    <div class="form-inline">
-    <div class="form-group">
-    <input type="file" id="files1" name="files[]" multiple />
-    <output id="list1"></output>
-  </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
-</div>
-</form> -->
-
-
-<button id="convert-btn" class="btn btn-success" onClick="convert()"> Convert </button>
-<button id="download-btn" class="btn btn-info" onClick="download()"> Download </button>
-</div>
-
-<script src="js/svgreader.js"></script>
-
-<!-- <div class="col-lg-6">
-<object id="svgtest"  type="image/svg+xml" data="random2d.svg" ></object>
-</div> -->
-
-
-
-
-
-
-
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="js/svgreader.js"></script>
 </body>
+
 </html>
