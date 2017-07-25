@@ -7,15 +7,7 @@ var previewTemplate = previewNode.parentNode.innerHTML;
 previewNode.parentNode.removeChild(previewNode);
 
 //**********FILE INPUT METHODS***********************
-function handleFileSelect(evt, isDrop) {
-  //alert(isDrop);
-  var files;
-  if (isDrop) {
-  files = evt.dataTransfer.files;
-  // FileList object
-  } else {
-  files = evt.target.files;
-  }
+function handleFileSelect(evt, files) {
   var uploadedID = '"uploaded"';
   // Loop through the FileList and render image files as thumbnails.
   for (var i = 0, f = files[i]; i < files.length; i++) {
@@ -59,13 +51,15 @@ var addSVGID = function(data, id) {
 
 var dropZone = document.getElementById('drop-zone');
 
-document.getElementById('files').addEventListener('change', handleFileSelect, false);
+document.getElementById('files').addEventListener('change', function(evt) {
+  handleFileSelect(evt, evt.target.files);
+});
 document.getElementById('to-click').addEventListener('mouseover', function() {
   changeDropStyle(true);
-}, false);
+});
 document.getElementById('to-click').addEventListener('mouseout', function() {
   changeDropStyle(false);
-}, false);
+});
 function changeDropStyle(b) {
   if (b) {
   dropZone.className = "upload-drop-zone drop";
@@ -81,7 +75,7 @@ dropZone.ondrop = function(evt) {
   this.className = 'upload-drop-zone';
 
   //startUpload(e.dataTransfer.files);
-  handleFileSelect(evt, true);
+  handleFileSelect(evt, evt.dataTransfer.files);
 
 }
 ;
