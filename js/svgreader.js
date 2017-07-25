@@ -8,43 +8,43 @@ previewNode.parentNode.removeChild(previewNode);
 
 //**********FILE INPUT METHODS***********************
 function handleFileSelect(evt, files) {
-  var uploadedID = '"uploaded"';
-  // Loop through the FileList and render image files as thumbnails.
-  for (var i = 0, f = files[i]; i < files.length; i++) {
+    var uploadedID = '"uploaded"';
+    // Loop through the FileList and render image files as thumbnails.
+    for (var i = 0, f = files[i]; i < files.length; i++) {
 
-  // Only process image files.
-  if (!f.type.match('image.*')) {
-    continue;
-  }
+        // Only process image files.
+        if (!f.type.match('image.*')) {
+            continue;
+        }
 
-  var reader = new FileReader();
+        var reader = new FileReader();
 
-  // Closure to capture the file information.
-  reader.onload = (function(f) {
-    return function(e) {
-    // Render thumbnail
-    //console.log(escape(f.name));
-    //console.log(e.target.result);
-    var data = e.target.result;
-    var obj = document.createElement('div');
-    obj.setAttribute('id', 'image-container');
-    data = addSVGID(data, "id=" + uploadedID + " ");
-    obj.innerHTML = [data].join('');
-    document.getElementById('list').insertBefore(obj, null);
+        // Closure to capture the file information.
+        reader.onload = (function(f) {
+            return function(e) {
+                // Render thumbnail
+                //console.log(escape(f.name));
+                //console.log(e.target.result);
+                var data = e.target.result;
+                var obj = document.createElement('div');
+                obj.setAttribute('id', 'image-container');
+                data = addSVGID(data, "id=" + uploadedID + " ");
+                obj.innerHTML = [data].join('');
+                document.getElementById('list').insertBefore(obj, null);
+            }
+            ;
+        })(f);
+
+        // Read in the image file as a data URL.
+        reader.readAsText(f);
     }
-    ;
-  })(f);
-
-  // Read in the image file as a data URL.
-  reader.readAsText(f);
-  }
 }
 
 var addSVGID = function(data, id) {
-  var indexToInsert = data.indexOf("xmlns");
-  var newData = data.slice(0, indexToInsert) + id + data.slice(indexToInsert);
-  //alert(data.slice(0, indexToInsert));
-  return newData;
+    var indexToInsert = data.indexOf("xmlns");
+    var newData = data.slice(0, indexToInsert) + id + data.slice(indexToInsert);
+    //alert(data.slice(0, indexToInsert));
+    return newData;
 };
 
 //var uploadForm = document.getElementById('js-upload-form');
@@ -52,188 +52,196 @@ var addSVGID = function(data, id) {
 var dropZone = document.getElementById('drop-zone');
 
 document.getElementById('files').addEventListener('change', function(evt) {
-  handleFileSelect(evt, evt.target.files);
+    handleFileSelect(evt, evt.target.files);
 });
 document.getElementById('to-click').addEventListener('mouseover', function() {
-  changeDropStyle(true);
+    changeDropStyle(true);
 });
 document.getElementById('to-click').addEventListener('mouseout', function() {
-  changeDropStyle(false);
+    changeDropStyle(false);
 });
+
 function changeDropStyle(b) {
-  if (b) {
-  dropZone.className = "upload-drop-zone drop";
-  } else {
-  dropZone.className = "upload-drop-zone";
-  }
+    if (b) {
+        dropZone.className = "upload-drop-zone drop";
+    } else {
+        dropZone.className = "upload-drop-zone";
+    }
 }
 
 dropZone.ondrop = function(evt) {
-  evt.stopPropagation();
-  evt.preventDefault();
-  evt.dataTransfer.dropEffect = 'copy';
-  this.className = 'upload-drop-zone';
+    evt.stopPropagation();
+    evt.preventDefault();
+    evt.dataTransfer.dropEffect = 'copy';
+    this.className = 'upload-drop-zone';
 
-  //startUpload(e.dataTransfer.files);
-  handleFileSelect(evt, evt.dataTransfer.files);
+    //startUpload(e.dataTransfer.files);
+    handleFileSelect(evt, evt.dataTransfer.files);
 
 }
 ;
 
 dropZone.ondragover = function() {
-  this.className = 'upload-drop-zone drop';
-  return false;
+    this.className = 'upload-drop-zone drop';
+    return false;
 }
 ;
 
 dropZone.ondragleave = function() {
-  this.className = 'upload-drop-zone';
-  return false;
+    this.className = 'upload-drop-zone';
+    return false;
 }
 ;
 
 dropZone.onclick = function() {
-  var uploadFiles = document.getElementById('drop-zone').files;
-  //e.preventDefault();
-  //alert("Clicked");
+    var uploadFiles = document.getElementById('drop-zone').files;
+    //e.preventDefault();
+    //alert("Clicked");
 }
 
 //************DOWNLOAD METHODS***********************
 function download() {
-  var filename = "converted";
-  var data = document.getElementById('image-container').innerHTML;
-  var type = "image/svg+xml";
-  //TODO: Implement getType() method that gets proper type
-  var file = new Blob([data],{
-  type: type
-  });
+    var filename = "converted";
+    var data = document.getElementById('image-container').innerHTML;
+    var type = "image/svg+xml";
+    //TODO: Implement getType() method that gets proper type
+    var file = new Blob([data],{
+        type: type
+    });
 
-  if (window.navigator.msSaveOrOpenBlob) {
-  // IE10+
+    if (window.navigator.msSaveOrOpenBlob) {
+        // IE10+
 
-  window.navigator.msSaveOrOpenBlob(file, filename);
+        window.navigator.msSaveOrOpenBlob(file, filename);
 
-  } else {
-  // Others
-  var a = document.createElement("a")
-  , url = URL.createObjectURL(file);
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(function() {
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  }, 0);
-  }
+    } else {
+        // Others
+        var a = document.createElement("a")
+          , url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 0);
+    }
 }
 
 //************CONVERTING METHODS*********************
 function convert() {
-  //  const scale = require('scale-color-perceptual');
-  //Use "scale.viridis(t)" to get viridis color, where 0<t<1.
-  //Works with inferno, magma, and plasma as well.
-  var object = document.getElementById("uploaded");
-  //var svg = object.contentDocument;
-  var elements = object.getElementsByTagName('*');
-  for (var i = 0; i < elements.length; i++) {
-  var jetColor = elements[i].getAttribute('fill');
-  var index = -1;
-  if (jetColor == null) {
-    jetColor = elements[i].style.fill;
-    if (jetColor != "") {
-    var rgb = jetColor.substring(4, jetColor.length - 1).replace(/ /g, '').split(',');
+    //  const scale = require('scale-color-perceptual');
+    //Use "scale.viridis(t)" to get viridis color, where 0<t<1.
+    //Works with inferno, magma, and plasma as well.
+    var object = document.getElementById("uploaded");
+    //var svg = object.contentDocument;
+    var elements = object.getElementsByTagName('*');
+    for (var i = 0; i < elements.length; i++) {
+        var jetColor = elements[i].getAttribute('fill');
+        var index = -1;
+        if (jetColor == null) {
+            jetColor = elements[i].style.fill;
+            if (jetColor != "") {
+                var rgb = jetColor.substring(4, jetColor.length - 1).replace(/ /g, '').split(',');
 
-    rgb[0] /= 255;
-    rgb[1] /= 255;
-    rgb[2] /= 255;
-    // alert(rgb[0] + " " + rgb[1] + " " + rgb[2]);
-    index = Math.floor(jet_to_val(rgb[0], rgb[1], rgb[2]) * 255);
-    } else {
-    index = 256;
+                rgb[0] /= 255;
+                rgb[1] /= 255;
+                rgb[2] /= 255;
+                // alert(rgb[0] + " " + rgb[1] + " " + rgb[2]);
+                index = Math.floor(jet_to_val(rgb[0], rgb[1], rgb[2]) * 255);
+            } else {
+                index = 256;
+            }
+        } else {
+            var r = hexToNumber(jetColor.substring(1, 3)) / 255;
+            var g = hexToNumber(jetColor.substring(3, 5)) / 255;
+            var b = hexToNumber(jetColor.substring(5)) / 255;
+
+            index = Math.floor(jet_to_val(r, g, b) * 255);
+
+        }
+
+        //   var r = hexToNumber(jetColor.substring(1, 3)) / 255;
+        //   var g = hexToNumber(jetColor.substring(3, 5)) / 255;
+        //   var b = hexToNumber(jetColor.substring(5)) / 255;
+        //  alert(r + " " + g + " " + b);
+        //alert(index);
+        if (index == 255 * 2) {
+            // VERY INEFFICIENT BUT IT WORKS
+            index = 256;
+            //#fffff (white?)
+        } else if (index == 255 * 3) {
+            index = 257;
+            //#000000 (black?)
+        } else if (index == 255 * 4) {
+            index = 258;
+            //Red for invalid colors
+            //
+            //Put code to notify user of invalid colors.
+            //
+        }
+        //alert(index);
+        var viridisColor = viridis[index];
+
+        //alert(viridisColor);
+        if (elements[i].getAttribute('fill') != null) {
+            elements[i].setAttribute('fill', viridisColor);
+        } else if (elements[i].style.fill != "") {
+            elements[i].style.fill = viridisColor;
+        }
     }
-  } else {
-    var r = hexToNumber(jetColor.substring(1, 3)) / 255;
-    var g = hexToNumber(jetColor.substring(3, 5)) / 255;
-    var b = hexToNumber(jetColor.substring(5)) / 255;
-
-    index = Math.floor(jet_to_val(r, g, b) * 255);
-
-  }
-
-  //   var r = hexToNumber(jetColor.substring(1, 3)) / 255;
-  //   var g = hexToNumber(jetColor.substring(3, 5)) / 255;
-  //   var b = hexToNumber(jetColor.substring(5)) / 255;
-  //  alert(r + " " + g + " " + b);
-  //alert(index);
-  if (index == 255 * 2) {
-    // VERY INEFFICIENT BUT IT WORKS
-    index = 256;
-    //#fffff (white?)
-  } else if (index == 255 * 3) {
-    index = 257;
-    //#000000 (black?)
-  } else if (index == 255 * 4) {
-    index = 258;
-    //Red for invalid colors
-    //
-    //Put code to notify user of invalid colors.
-    //
-  }
-  //alert(index);
-  var viridisColor = viridis[index];
-
-  //alert(viridisColor);
-  if (elements[i].getAttribute('fill') != null) {
-    elements[i].setAttribute('fill', viridisColor);
-  } else if (elements[i].style.fill != "") {
-    elements[i].style.fill = viridisColor;
-  }
-  }
 }
 ;//document.getElementById("convert-btn").onclick = convert;
 //
 function hexToNumber(hex) {
-  return (16 * sixteenBitToDec(hex.charAt(0))) + (sixteenBitToDec(hex.charAt(1)));
+    return (16 * sixteenBitToDec(hex.charAt(0))) + (sixteenBitToDec(hex.charAt(1)));
 }
 //
 //
 function sixteenBitToDec(bit) {
-  switch (bit) {
-    case 'A': return 10;
-    case 'B': return 11;
-    case 'C': return 12;
-    case 'D': return 13;
-    case 'E': return 14;
-    case 'F': return 15;
-    default: return parseInt(bit);
-  }
+    switch (bit) {
+    case 'A':
+        return 10;
+    case 'B':
+        return 11;
+    case 'C':
+        return 12;
+    case 'D':
+        return 13;
+    case 'E':
+        return 14;
+    case 'F':
+        return 15;
+    default:
+        return parseInt(bit);
+    }
 }
 
 function jet_to_val(r, g, b) {
-  /* convert a jet pixel into it's value
-  http://blogs.mathworks.com/cleve/2015/02/02/origins-of-colormaps/
-  */
+    /* convert a jet pixel into it's value
+    http://blogs.mathworks.com/cleve/2015/02/02/origins-of-colormaps/
+    */
 
-  if (g == 0 && r == 0) {
-    return b / 4 - 1 / 8;
-  } else if (b == 1) {
-    if (r != 0)
-      return -1;
-    return g / 4 + 1 / 8;
-  } else if (g == 1) {
-    return r / 4 + 3 / 8;
-  } else if (r == 1) {
-    if (b != 0)
-      return -1;
-    return -g / 4 + 7 / 8;
-  } else if (g == 0 && b == 0) {
-    return -r / 4 + 9 / 8;
-  } else if (r == 0 && g == 0 && b == 0) {
-    return 3;
-  } else if (r == 1 && g == 1 && b == 1) {
-    return 2;
-  } else {
-    return 4;
-  }
+    if (g == 0 && r == 0) {
+        return b / 4 - 1 / 8;
+    } else if (b == 1) {
+        if (r != 0)
+            return -1;
+        return g / 4 + 1 / 8;
+    } else if (g == 1) {
+        return r / 4 + 3 / 8;
+    } else if (r == 1) {
+        if (b != 0)
+            return -1;
+        return -g / 4 + 7 / 8;
+    } else if (g == 0 && b == 0) {
+        return -r / 4 + 9 / 8;
+    } else if (r == 0 && g == 0 && b == 0) {
+        return 3;
+    } else if (r == 1 && g == 1 && b == 1) {
+        return 2;
+    } else {
+        return 4;
+    }
 }
