@@ -200,32 +200,15 @@ function hexToNumber(hex) {
 //
 //
 function sixteenBitToDec(bit) {
-  var toReturn = -1;
   switch (bit) {
-  case 'A':
-  toReturn = 10;
-  break;
-  case 'B':
-  toReturn = 11;
-  break;
-  case 'C':
-  toReturn = 12;
-  break;
-  case 'D':
-  toReturn = 13;
-  break;
-  case 'E':
-  toReturn = 14;
-  break;
-  case 'F':
-  toReturn = 15;
-  break;
-  default:
-  toReturn = parseInt(bit);
-  break;
+    case 'A': return 10;
+    case 'B': return 11;
+    case 'C': return 12;
+    case 'D': return 13;
+    case 'E': return 14;
+    case 'F': return 15;
+    default: return parseInt(bit);
   }
-  //alert(toReturn);
-  return toReturn;
 }
 
 function jet_to_val(r, g, b) {
