@@ -6,40 +6,40 @@ function handleFileSelect(evt, isDrop) {
   //alert(isDrop);
   var files;
   if (isDrop) {
-    files = evt.dataTransfer.files;
-    // FileList object
+  files = evt.dataTransfer.files;
+  // FileList object
   } else {
-    files = evt.target.files;
+  files = evt.target.files;
   }
   var uploadedID = '"uploaded"';
   // Loop through the FileList and render image files as thumbnails.
   for (var i = 0, f = files[i]; i < files.length; i++) {
 
-    // Only process image files.
-    if (!f.type.match('image.*')) {
-      continue;
+  // Only process image files.
+  if (!f.type.match('image.*')) {
+    continue;
+  }
+
+  var reader = new FileReader();
+
+  // Closure to capture the file information.
+  reader.onload = (function(f) {
+    return function(e) {
+    // Render thumbnail
+    //console.log(escape(f.name));
+    //console.log(e.target.result);
+    var data = e.target.result;
+    var obj = document.createElement('div');
+    obj.setAttribute('id', 'image-container');
+    data = addSVGID(data, "id=" + uploadedID + " ");
+    obj.innerHTML = [data].join('');
+    document.getElementById('list').insertBefore(obj, null);
     }
+    ;
+  })(f);
 
-    var reader = new FileReader();
-
-    // Closure to capture the file information.
-    reader.onload = (function(f) {
-      return function(e) {
-        // Render thumbnail
-        //console.log(escape(f.name));
-        //console.log(e.target.result);
-        var data = e.target.result;
-        var obj = document.createElement('div');
-        obj.setAttribute('id', 'image-container');
-        data = addSVGID(data, "id=" + uploadedID + " ");
-        obj.innerHTML = [data].join('');
-        document.getElementById('list').insertBefore(obj, null);
-      }
-      ;
-    })(f);
-
-    // Read in the image file as a data URL.
-    reader.readAsText(f);
+  // Read in the image file as a data URL.
+  reader.readAsText(f);
   }
 }
 
@@ -63,9 +63,9 @@ document.getElementById('to-click').addEventListener('mouseout', function() {
 }, false);
 function changeDropStyle(b) {
   if (b) {
-    dropZone.className = "upload-drop-zone drop";
+  dropZone.className = "upload-drop-zone drop";
   } else {
-    dropZone.className = "upload-drop-zone";
+  dropZone.className = "upload-drop-zone";
   }
 }
 
@@ -78,17 +78,20 @@ dropZone.ondrop = function(evt) {
   //startUpload(e.dataTransfer.files);
   handleFileSelect(evt, true);
 
-};
+}
+;
 
 dropZone.ondragover = function() {
   this.className = 'upload-drop-zone drop';
   return false;
-};
+}
+;
 
 dropZone.ondragleave = function() {
   this.className = 'upload-drop-zone';
   return false;
-};
+}
+;
 
 dropZone.onclick = function() {
   var uploadFiles = document.getElementById('drop-zone').files;
@@ -103,26 +106,26 @@ function download() {
   var type = "image/svg+xml";
   //TODO: Implement getType() method that gets proper type
   var file = new Blob([data],{
-    type: type
+  type: type
   });
 
   if (window.navigator.msSaveOrOpenBlob) {
-    // IE10+
+  // IE10+
 
-    window.navigator.msSaveOrOpenBlob(file, filename);
+  window.navigator.msSaveOrOpenBlob(file, filename);
 
   } else {
-    // Others
-    var a = document.createElement("a")
-    , url = URL.createObjectURL(file);
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function() {
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    }, 0);
+  // Others
+  var a = document.createElement("a")
+  , url = URL.createObjectURL(file);
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function() {
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }, 0);
   }
 }
 
@@ -135,58 +138,58 @@ function convert() {
   //var svg = object.contentDocument;
   var elements = object.getElementsByTagName('*');
   for (var i = 0; i < elements.length; i++) {
-    var jetColor = elements[i].getAttribute('fill');
-    var index = -1;
-    if (jetColor == null) {
-      jetColor = elements[i].style.fill;
-      if (jetColor != "") {
-        var rgb = jetColor.substring(4, jetColor.length - 1).replace(/ /g, '').split(',');
+  var jetColor = elements[i].getAttribute('fill');
+  var index = -1;
+  if (jetColor == null) {
+    jetColor = elements[i].style.fill;
+    if (jetColor != "") {
+    var rgb = jetColor.substring(4, jetColor.length - 1).replace(/ /g, '').split(',');
 
-        rgb[0] /= 255;
-        rgb[1] /= 255;
-        rgb[2] /= 255;
-        // alert(rgb[0] + " " + rgb[1] + " " + rgb[2]);
-        index = Math.floor(jet_to_val(rgb[0], rgb[1], rgb[2]) * 255);
-      } else {
-        index = 256;
-      }
+    rgb[0] /= 255;
+    rgb[1] /= 255;
+    rgb[2] /= 255;
+    // alert(rgb[0] + " " + rgb[1] + " " + rgb[2]);
+    index = Math.floor(jet_to_val(rgb[0], rgb[1], rgb[2]) * 255);
     } else {
-      var r = hexToNumber(jetColor.substring(1, 3)) / 255;
-      var g = hexToNumber(jetColor.substring(3, 5)) / 255;
-      var b = hexToNumber(jetColor.substring(5)) / 255;
-
-      index = Math.floor(jet_to_val(r, g, b) * 255);
-
+    index = 256;
     }
+  } else {
+    var r = hexToNumber(jetColor.substring(1, 3)) / 255;
+    var g = hexToNumber(jetColor.substring(3, 5)) / 255;
+    var b = hexToNumber(jetColor.substring(5)) / 255;
 
-    //   var r = hexToNumber(jetColor.substring(1, 3)) / 255;
-    //   var g = hexToNumber(jetColor.substring(3, 5)) / 255;
-    //   var b = hexToNumber(jetColor.substring(5)) / 255;
-    //  alert(r + " " + g + " " + b);
-    //alert(index);
-    if (index == 255 * 2) {
-      // VERY INEFFICIENT BUT IT WORKS
-      index = 256;
-      //#fffff (white?)
-    } else if (index == 255 * 3) {
-      index = 257;
-      //#000000 (black?)
-    } else if (index == 255 * 4) {
-      index = 258;
-      //Red for invalid colors
-      //
-      //Put code to notify user of invalid colors.
-      //
-    }
-    //alert(index);
-    var viridisColor = viridis[index];
+    index = Math.floor(jet_to_val(r, g, b) * 255);
 
-    //alert(viridisColor);
-    if (elements[i].getAttribute('fill') != null) {
-      elements[i].setAttribute('fill', viridisColor);
-    } else if (elements[i].style.fill != "") {
-      elements[i].style.fill = viridisColor;
-    }
+  }
+
+  //   var r = hexToNumber(jetColor.substring(1, 3)) / 255;
+  //   var g = hexToNumber(jetColor.substring(3, 5)) / 255;
+  //   var b = hexToNumber(jetColor.substring(5)) / 255;
+  //  alert(r + " " + g + " " + b);
+  //alert(index);
+  if (index == 255 * 2) {
+    // VERY INEFFICIENT BUT IT WORKS
+    index = 256;
+    //#fffff (white?)
+  } else if (index == 255 * 3) {
+    index = 257;
+    //#000000 (black?)
+  } else if (index == 255 * 4) {
+    index = 258;
+    //Red for invalid colors
+    //
+    //Put code to notify user of invalid colors.
+    //
+  }
+  //alert(index);
+  var viridisColor = viridis[index];
+
+  //alert(viridisColor);
+  if (elements[i].getAttribute('fill') != null) {
+    elements[i].setAttribute('fill', viridisColor);
+  } else if (elements[i].style.fill != "") {
+    elements[i].style.fill = viridisColor;
+  }
   }
 }
 ;//document.getElementById("convert-btn").onclick = convert;
@@ -199,27 +202,27 @@ function hexToNumber(hex) {
 function sixteenBitToDec(bit) {
   var toReturn = -1;
   switch (bit) {
-    case 'A':
-    toReturn = 10;
-    break;
-    case 'B':
-    toReturn = 11;
-    break;
-    case 'C':
-    toReturn = 12;
-    break;
-    case 'D':
-    toReturn = 13;
-    break;
-    case 'E':
-    toReturn = 14;
-    break;
-    case 'F':
-    toReturn = 15;
-    break;
-    default:
-    toReturn = parseInt(bit);
-    break;
+  case 'A':
+  toReturn = 10;
+  break;
+  case 'B':
+  toReturn = 11;
+  break;
+  case 'C':
+  toReturn = 12;
+  break;
+  case 'D':
+  toReturn = 13;
+  break;
+  case 'E':
+  toReturn = 14;
+  break;
+  case 'F':
+  toReturn = 15;
+  break;
+  default:
+  toReturn = parseInt(bit);
+  break;
   }
   //alert(toReturn);
   return toReturn;
@@ -233,16 +236,14 @@ function jet_to_val(r, g, b) {
   if (g == 0 && r == 0) {
     return b / 4 - 1 / 8;
   } else if (b == 1) {
-    if (r != 0) {
+    if (r != 0)
       return -1;
-    }
     return g / 4 + 1 / 8;
   } else if (g == 1) {
     return r / 4 + 3 / 8;
   } else if (r == 1) {
-    if (b != 0) {
+    if (b != 0)
       return -1;
-    }
     return -g / 4 + 7 / 8;
   } else if (g == 0 && b == 0) {
     return -r / 4 + 9 / 8;
@@ -251,7 +252,6 @@ function jet_to_val(r, g, b) {
   } else if (r == 1 && g == 1 && b == 1) {
     return 2;
   } else {
-    //alert("Ayyy");
     return 4;
   }
 }
