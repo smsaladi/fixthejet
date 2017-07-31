@@ -37,6 +37,15 @@
   display: none;
 }
 
+#worker {
+  width: 100%;
+  padding-left: 6px;
+  padding-bottom: 6px;
+  height: auto;
+  background-color: #c0c0c0;
+  border-radius: 5px;
+}
+
 body {
     background-color: #424242;
 }
