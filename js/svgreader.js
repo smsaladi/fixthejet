@@ -8,7 +8,7 @@ previewNode.parentNode.removeChild(previewNode);
 
 //**********FILE INPUT METHODS***********************
 function handleFileSelect(evt, files) {
-  var uploadedID = '"uploaded"';
+  var uploadedID = "uploaded";
   // Loop through the FileList and render image files as thumbnails.
   for (var i = 0, f = files[i]; i < files.length; i++) {
     var type = "nonimg";
@@ -39,14 +39,19 @@ function handleFileSelect(evt, files) {
           document.getElementById('list').insertBefore(obj, null);
         } else if (f.type.match('image/png')) {
           //address how to put a png in the output
-
-          var image = document.createElement("IMG");
-          image.height = 200;
-          image.id = "test";
+          var canvas = document.createElement("canvas");
+          canvas.id = uploadedID;
+          obj.appendChild(canvas);
+          context = canvas.getContext('2d');
+          var image = new Image();//document.createElement("IMG");
+          //image.height = 200;
+          //image.id = uploadedID;
           image.src = data;
-          console.log(image.src);
-          // console.log(image.id);
-          obj.appendChild(image);
+          image.onload = function(){
+            canvas.width = image.width;
+            canvas.height = image.height;
+            context.drawImage(image, 0, 0);
+          }
           document.getElementById('list').insertBefore(obj, null);
         }
       }
@@ -123,30 +128,37 @@ dropZone.onclick = function() {
 }
 
 //************DOWNLOAD METHODS***********************
-function download() {
-  var filename = "converted";
+function download(link, canvasID, filename) {
   var element = document.getElementById('image-container')
   var type = getType(element);
   //TODO: Implement getType() method that gets proper type
-  var data = null;
+  var data = "";
+  var url = "";
+  var file = null;
   if (type == "image/svg+xml") {
     data = element.innerHTML;
+
+    file = new Blob([data],{
+      type: type
+    });
+    url = URL.createObjectURL(file);
   } else if (type == "image/png") {
-    //get new data somehow?
+    filename += ".png";
+    var canvas = element.childNodes[0];
+    url = canvas.toDataURL();
+    file = new Blob([url],{
+      type: type
+    });
   }
-  var file = new Blob([data],{
-    type: type
-  });
+
 
   if (window.navigator.msSaveOrOpenBlob) {
     // IE10+
-
     window.navigator.msSaveOrOpenBlob(file, filename);
 
   } else {
     // Others
     var a = document.createElement("a");
-    url = URL.createObjectURL(file);
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
@@ -156,12 +168,36 @@ function download() {
       window.URL.revokeObjectURL(url);
     }, 0);
   }
+  console.log("Done");
+
 }
 
 function getType(element) {
-  console.log(element);
-  return "image/svg+xml"; //CHANGE
+  var c = element.childNodes;
+  var name = "";
+  if (c.length != 0) {
+    for (var i = 0; i < c.length; i++) {
+      if ((c[i].nodeName).includes("#")) {
+        continue;
+      }
+      name = c[i].nodeName;
+      break;
+    }
+  }
+  name = name.toUpperCase();
+  console.log(name);
+  if (name == "CANVAS") {
+    return "image/png";
+  } else if (name == "SVG") {
+    return "image/svg+xml";
+  } else {
+    return NULL;
+  }
 }
+
+document.getElementById('download-btn').addEventListener('click', function() {
+    download(this, 'uploaded', 'converted');
+}, false);
 
 //************CONVERTING METHODS*********************
 function convert() {
@@ -169,64 +205,76 @@ function convert() {
   //Use "scale.viridis(t)" to get viridis color, where 0<t<1.
   //Works with inferno, magma, and plasma as well.
   var object = document.getElementById("uploaded");
-  //var svg = object.contentDocument;
-  var elements = object.getElementsByTagName('*');
-  for (var i = 0; i < elements.length; i++) {
-    var jetColor = elements[i].getAttribute('fill');
-    var index = -1;
-    if (jetColor == null) {
-      jetColor = elements[i].style.fill;
-      if (jetColor != "") {
-        var rgb = jetColor.substring(4, jetColor.length - 1).replace(/ /g, '').split(',');
+  var name = (object.nodeName).toUpperCase();
+  if (name == "CANVAS") {
+    //Convert images using pretrained neural net model here.
+    var ctx = object.getContext('2d');
+    var imageData = ctx.getImageData(0, 0, object.width, object.height);
+    for (var i = 0; i < imageData.data.length; i += 4) {
+        //console.log(pixel);
+        var place = imageData.data[i];
+        imageData.data[i] = imageData.data[i+1];
+        imageData.data[i+1] = imageData.data[i+2];
+        imageData.data[i+2] = place;
+        imageData.data[i+3] = 255;
+        //console.log(pixelData);
+    }
+    ctx.putImageData(imageData, 0, 0);
+    console.log("done");
+  } else if (name == "SVG") {
+    var elements = object.getElementsByTagName('*');
 
-        rgb[0] /= 255;
-        rgb[1] /= 255;
-        rgb[2] /= 255;
-        // alert(rgb[0] + " " + rgb[1] + " " + rgb[2]);
-        index = Math.floor(jet_to_val(rgb[0], rgb[1], rgb[2]) * 255);
+    for (var i = 0; i < elements.length; i++) {
+      var jetColor = elements[i].getAttribute('fill');
+      var index = -1;
+      if (jetColor == null) {
+        jetColor = elements[i].style.fill;
+        if (jetColor != "") {
+          var rgb = jetColor.substring(4, jetColor.length - 1).replace(/ /g, '').split(',');
+
+          rgb[0] /= 255;
+          rgb[1] /= 255;
+          rgb[2] /= 255;
+          // alert(rgb[0] + " " + rgb[1] + " " + rgb[2]);
+          index = Math.floor(jet_to_val(rgb[0], rgb[1], rgb[2]) * 255);
+        } else {
+          index = 256;
+        }
       } else {
-        index = 256;
+        var r = hexToNumber(jetColor.substring(1, 3)) / 255;
+        var g = hexToNumber(jetColor.substring(3, 5)) / 255;
+        var b = hexToNumber(jetColor.substring(5)) / 255;
+
+        index = Math.floor(jet_to_val(r, g, b) * 255);
+
       }
-    } else {
-      var r = hexToNumber(jetColor.substring(1, 3)) / 255;
-      var g = hexToNumber(jetColor.substring(3, 5)) / 255;
-      var b = hexToNumber(jetColor.substring(5)) / 255;
+      if (index == 255 * 2) {
+        // VERY INEFFICIENT BUT IT WORKS
+        index = 256;
+        //#fffff (white?)
+      } else if (index == 255 * 3) {
+        index = 257;
+        //#000000 (black?)
+      } else if (index == 255 * 4) {
+        index = 258;
+        //Red for invalid colors
+        //
+        //Put code to notify user of invalid colors.
+        //
+      }
+      //alert(index);
+      var viridisColor = viridis[index];
 
-      index = Math.floor(jet_to_val(r, g, b) * 255);
-
-    }
-
-    //   var r = hexToNumber(jetColor.substring(1, 3)) / 255;
-    //   var g = hexToNumber(jetColor.substring(3, 5)) / 255;
-    //   var b = hexToNumber(jetColor.substring(5)) / 255;
-    //  alert(r + " " + g + " " + b);
-    //alert(index);
-    if (index == 255 * 2) {
-      // VERY INEFFICIENT BUT IT WORKS
-      index = 256;
-      //#fffff (white?)
-    } else if (index == 255 * 3) {
-      index = 257;
-      //#000000 (black?)
-    } else if (index == 255 * 4) {
-      index = 258;
-      //Red for invalid colors
-      //
-      //Put code to notify user of invalid colors.
-      //
-    }
-    //alert(index);
-    var viridisColor = viridis[index];
-
-    //alert(viridisColor);
-    if (elements[i].getAttribute('fill') != null) {
-      elements[i].setAttribute('fill', viridisColor);
-    } else if (elements[i].style.fill != "") {
-      elements[i].style.fill = viridisColor;
+      //alert(viridisColor);
+      if (elements[i].getAttribute('fill') != null) {
+        elements[i].setAttribute('fill', viridisColor);
+      } else if (elements[i].style.fill != "") {
+        elements[i].style.fill = viridisColor;
+      }
     }
   }
 }
-;//document.getElementById("convert-btn").onclick = convert;
+//document.getElementById("convert-btn").onclick = convert;
 //
 function hexToNumber(hex) {
   return (16 * sixteenBitToDec(hex.charAt(0))) + (sixteenBitToDec(hex.charAt(1)));
