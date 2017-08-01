@@ -1,3 +1,6 @@
+import functools
+import operator
+
 import numpy as np
 import scipy.special
 
@@ -18,11 +21,13 @@ def airy_1d(r):
 def airy_Nd(*args):
     return airy_1d(np.linalg.norm(args))
 
-def expand_plate(from_arr, row_size, col_size):
+def expand_arr(from_arr, *args):
     """Expands a plate using a given row and col size
     """
-    stamp = np.ones(row_size * col_size)
-    stamp.shape = [row_size, col_size, 1]
+    # multiply each element of the list args together
+    new_size = functools.reduce(operator.mul, args, 1)
+    stamp = np.ones(new_size)
+    stamp.shape = args
     return np.kron(from_arr, stamp).astype(from_arr.dtype)
 
 x = np.linspace(-10, 10, 1000)
@@ -36,7 +41,7 @@ plt.close()
 
 z_jet = cm.jet(z)
 z_jet_small = scipy.misc.imresize(z_jet, .1)
-z_jet_expanded = expand_plate(z_jet_small, 10, 10)
+z_jet_expanded = expand_plate(z_jet_small, 10, 10, 1)
 plt.imshow(z_jet_small)
 plt.clim(0, 1)
 plt.savefig("airy_disk_small.png")
