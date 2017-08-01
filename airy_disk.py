@@ -32,6 +32,7 @@ def expand_arr(from_arr, *args):
 
 x = np.linspace(-10, 10, 1000)
 z = airy_Nd(*np.meshgrid(x, x, sparse=True))
+z_jet = cm.jet(z)
 
 plt.imshow(z, cmap=cm.jet, extent=[-20, 20, -20, 20])
 plt.colorbar()
@@ -39,11 +40,10 @@ plt.clim(0, 1)
 plt.savefig("airy_disk.png")
 plt.close()
 
-z_jet = cm.jet(z)
-z_jet_small = scipy.misc.imresize(z_jet, .1)
-z_jet_expanded = expand_plate(z_jet_small, 10, 10, 1)
-plt.imshow(z_jet_small)
-plt.clim(0, 1)
-plt.savefig("airy_disk_small.png")
+def reduce_expand(arr, fact):
+    arr_small = scipy.misc.imresize(arr, 1/fact)
+    arr_expanded = expand_plate(arr_small, fact, fact, 1)
+    assert np.array_equal(arr.shape, arr_expanded.shape)
+    return arr_expanded
 
-plt.show()
+set_of_images = [reduce_expand(z_jet, f) for f in [2, 4, 5, 8, 10]]
