@@ -1,12 +1,10 @@
 .upload-drop-zone {
-
-
   border-radius: 5px;
   border-width: 2px;
   margin-bottom: 20px;
   margin-left: 10px;
   margin-right: 10px;
-  margin-top: 20px;
+  margin-top: 30px;
   height: 200px;
   color: #c0c0c0;
   border-style: solid;
@@ -26,6 +24,23 @@
   height: 220px;
 }
 
+.worker {
+  width: 100%;
+  padding-left: 6px;
+  padding-bottom: 6px;
+  margin-top: 10px;
+  height: auto;
+  background-color: #c0c0c0;
+  border-radius: 5px;
+}
+
+.button-container {
+  position: relative;
+  float: right;
+  z-index: 2;
+  margin-right: 6px;
+}
+
 #to-click {
   cursor: pointer;
   font-family: verdana;
@@ -35,15 +50,6 @@
 
 #files {
   display: none;
-}
-
-#worker {
-  width: 100%;
-  padding-left: 6px;
-  padding-bottom: 6px;
-  height: auto;
-  background-color: #c0c0c0;
-  border-radius: 5px;
 }
 
 body {
