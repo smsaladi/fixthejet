@@ -5,11 +5,13 @@ var previewNode = document.querySelector("#template");
 previewNode.id = "";
 var previewTemplate = previewNode.parentNode.innerHTML;
 previewNode.parentNode.removeChild(previewNode);
-
+var currentImgIndex = 0;
 //**********FILE INPUT METHODS***********************
 function handleFileSelect(evt, files) {
   var uploadedID = "uploaded";
   // Loop through the FileList and render image files as thumbnails.
+  createImgSpace(currentImgIndex + 1);
+
   for (var i = 0, f = files[i]; i < files.length; i++) {
     var type = "nonimg";
     if (f.type.match('image/svg')) {
@@ -27,20 +29,17 @@ function handleFileSelect(evt, files) {
     // Closure to capture the file information.
     reader.onload = (function(f) {
       return function(e) {
-
+        var index = currentImgIndex;
         var data = e.target.result;
         //console.log(f);
         var obj = document.createElement('div');
         obj.setAttribute('id', 'image-container');
         if (type == "svg") {
-
-          data = addSVGID(data, "id=" + uploadedID + " ");
+          data = addSVGID(data, "id=" + uploadedID + index + " ");
           obj.innerHTML = [data].join('');
-          document.getElementById('list').insertBefore(obj, null);
         } else if (f.type.match('image/png')) {
-          //address how to put a png in the output
           var canvas = document.createElement("canvas");
-          canvas.id = uploadedID;
+          canvas.id = uploadedID + index;
           obj.appendChild(canvas);
           context = canvas.getContext('2d');
           var image = new Image();//document.createElement("IMG");
@@ -52,8 +51,9 @@ function handleFileSelect(evt, files) {
             canvas.height = image.height;
             context.drawImage(image, 0, 0);
           }
-          document.getElementById('list').insertBefore(obj, null);
+
         }
+        document.getElementById('list' + index).insertBefore(obj, null);
       }
       ;
     })(f);
@@ -65,6 +65,26 @@ function handleFileSelect(evt, files) {
       reader.readAsDataURL(f);
     }
   }
+  currentImgIndex++;
+}
+
+function createImgSpace(index) {
+  var div = document.createElement('DIV');
+  var workerNum = "worker" + index;
+  div.className="worker";
+  div.id=workerNum;
+  var inner = "<output id=\"list" + index + "\">" +
+  "<div class=\"button-container\">" +
+  "<button id=\"convert-btn\" class=\"btn btn-success\" onClick=\"convert(" + index + ")\"> Convert </button>" +
+  "<button id=\"download-btn" + index + "\" class=\"btn btn-info\"> Download </button>" +
+  "</div>" +
+  "</output>";
+  div.innerHTML = inner;
+  document.getElementById('image-list').appendChild(div);
+  document.getElementById('download-btn' + index).addEventListener('click', function() {
+      download(this, 'uploaded' + index , 'converted');
+  }, false);
+  alert("Appended the Child");
 }
 
 //WARNING: THIS METHOD IS VERY SKETCHY AND SHOULD EVENTUALLY BE MADE BETTER
@@ -194,30 +214,28 @@ function getType(element) {
     return NULL;
   }
 }
+//*************UNCOMMENT OR FIX BELOW CODE ***********************
 
-document.getElementById('download-btn').addEventListener('click', function() {
-    download(this, 'uploaded', 'converted');
-}, false);
 
 //************CONVERTING METHODS*********************
-function convert() {
+function convert(index) {
   //  const scale = require('scale-color-perceptual');
   //Use "scale.viridis(t)" to get viridis color, where 0<t<1.
   //Works with inferno, magma, and plasma as well.
-  var object = document.getElementById("uploaded");
+  var object = document.getElementById("uploaded" + index);
   var name = (object.nodeName).toUpperCase();
   if (name == "CANVAS") {
     //Convert images using pretrained neural net model here.
     var ctx = object.getContext('2d');
     var imageData = ctx.getImageData(0, 0, object.width, object.height);
     for (var i = 0; i < imageData.data.length; i += 4) {
-        //console.log(pixel);
-        var place = imageData.data[i];
-        imageData.data[i] = imageData.data[i+1];
-        imageData.data[i+1] = imageData.data[i+2];
-        imageData.data[i+2] = place;
-        imageData.data[i+3] = 255;
-        //console.log(pixelData);
+      //console.log(pixel);
+      var place = imageData.data[i];
+      imageData.data[i] = imageData.data[i+1];
+      imageData.data[i+1] = imageData.data[i+2];
+      imageData.data[i+2] = place;
+      imageData.data[i+3] = 255;
+      //console.log(pixelData);
     }
     ctx.putImageData(imageData, 0, 0);
     console.log("done");
