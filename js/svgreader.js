@@ -75,12 +75,16 @@ function createImgSpace(index) {
   var workerNum = "worker" + index;
   div.className="worker";
   div.id=workerNum;
-  var inner = "<output id=\"list" + index + "\">" +
+  var inner = "<output class=\"imgs\" id=\"list" + index + "\"></output>" +
   "<div class=\"button-container\">" +
-  "<button id=\"convert-btn\" class=\"btn btn-success\" onClick=\"convert(" + index + ")\"> Convert </button>" +
-  "<button id=\"download-btn" + index + "\" class=\"btn btn-info\"> Download </button>" +
-  "</div>" +
-  "</output>";
+  "<button id=\"convert-btn\" class=\"btn btn-success\" onClick=\"convert(" + index + ")\">" +
+        "<span>Convert </span><i class=\"glyphicon glyphicon-flash\"></i></button>" +
+  "<button id=\"download-btn" + index + "\" class=\"btn btn-info\">" +
+        "<span>Download </span><i class=\"glyphicon glyphicon-download\"></i></button>" +
+  "<button id=\"delete-btn\" class =\"btn btn-danger delete\" onClick=\"del(" + index + ")\">" +
+        "<span>Delete </span><i class=\"glyphicon glyphicon-remove\"></i></button>" +
+  "</div>";
+
   div.innerHTML = inner;
   document.getElementById('image-list').appendChild(div);
   document.getElementById('download-btn' + index).addEventListener('click', function() {
@@ -146,6 +150,13 @@ dropZone.onclick = function() {
   var uploadFiles = document.getElementById('drop-zone').files;
   //e.preventDefault();
   //alert("Clicked");
+}
+;
+
+function del(index) {
+  var list = document.getElementById("image-list");
+  var child = document.getElementById("worker" + index);
+  list.removeChild(child);
 }
 
 //************DOWNLOAD METHODS***********************

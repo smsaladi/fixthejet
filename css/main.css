@@ -25,20 +25,28 @@
 }
 
 .worker {
-  width: 100%;
   padding-left: 6px;
   padding-bottom: 6px;
   margin-top: 10px;
   height: auto;
   background-color: #c0c0c0;
   border-radius: 5px;
+  min-height: 100px;
+  overflow: hidden;
+}
+
+.imgs {
+  position: relative;
+  top: 0;
 }
 
 .button-container {
   position: relative;
-  float: right;
-  z-index: 2;
+  left: 0;
+  top: 0;
+  margin-top: 6px;
   margin-right: 6px;
+  z-index: 2;
 }
 
 #to-click {
