@@ -46,6 +46,6 @@ def reduce_expand(arr, fact):
     assert np.array_equal(arr.shape, arr_expanded.shape)
     return arr_expanded
 #This will be our input train data (X)
-set_of_compressed_images = [reduce_expand(z_jet, f) for f in [2, 4, 5, 8, 10]]
+set_of_compressed_images = [reduce_expand(z_jet, f) for f in [1, 2, 4, 5, 8, 10]]
 #This will be our output train data (Y)
-z_train=[z, z, z, z, z]
+z_train=[z, z, z, z, z, z]
