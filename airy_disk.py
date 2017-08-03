@@ -34,16 +34,18 @@ x = np.linspace(-10, 10, 1000)
 z = airy_Nd(*np.meshgrid(x, x, sparse=True))
 z_jet = cm.jet(z)
 
-plt.imshow(z, cmap=cm.jet, extent=[-20, 20, -20, 20])
-plt.colorbar()
-plt.clim(0, 1)
-plt.savefig("airy_disk.png")
-plt.close()
+# plt.imshow(z, cmap=cm.jet, extent=[-20, 20, -20, 20])
+# plt.colorbar()
+# plt.clim(0, 1)
+# plt.savefig("airy_disk.png")
+# plt.close()
 
 def reduce_expand(arr, fact):
     arr_small = scipy.misc.imresize(arr, 1/fact)
-    arr_expanded = expand_plate(arr_small, fact, fact, 1)
+    arr_expanded = expand_arr(arr_small, fact, fact, 1)
     assert np.array_equal(arr.shape, arr_expanded.shape)
     return arr_expanded
-
-set_of_images = [reduce_expand(z_jet, f) for f in [2, 4, 5, 8, 10]]
+#This will be our input train data (X)
+set_of_compressed_images = [reduce_expand(z_jet, f) for f in [2, 4, 5, 8, 10]]
+#This will be our output train data (Y)
+z_train=[z, z, z, z, z]
