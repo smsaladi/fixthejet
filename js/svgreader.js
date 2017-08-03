@@ -8,85 +8,6 @@ previewNode.parentNode.removeChild(previewNode);
 var currentImgIndex = 0;
 
 
-var data = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
-var newArr = [];
-for(var i = 0; i < data.length; i++)
-{
-    newArr = newArr.concat(data[i]);
-}
-var model = new KerasJS.Model({
-  filepaths: {
-    model: 'dist/model.json',
-    weights: 'dist/model_weights.buf',
-    metadata: 'dist/model_metadata.json'
-  },
-  gpu: true
-});
-model.ready()
-  .then(function() {
-    console.log("1");
-    // input data object keyed by names of the input layers
-    // or `input` for Sequential models
-    // values are the flattened Float32Array data
-    // (input tensor shapes are specified in the model config)
-    var inputData = {
-      'input': new Float32Array(newArr)
-    };
-    console.log("2 " + inputData);
-    // make predictions
-    return model.predict(inputData);
-  })
-  .then(function(outputData) {
-    // outputData is an object keyed by names of the output layers
-    // or `output` for Sequential models
-    // e.g.,
-    // outputData['fc1000']
-    var probs = outputData['output'];
-    var sum = 0;
-    var maxProbindex=0;
-
-    for (var i = 0; i < probs.length; i++) {
-      sum += probs[i];
-      console.log(probs[i]);
-      if (probs[i] > probs[maxProbindex]) {
-        maxProbindex = i;
-      }
-    }
-    return (maxProbindex);
-
-  })
-  .catch(function(err) {
-    console.log(err);
-    // handle error
-  });
-
 //**********FILE INPUT METHODS***********************
 function handleFileSelect(evt, files) {
   var uploadedID = "uploaded";
@@ -429,4 +350,66 @@ function jet_to_val(r, g, b) {
   } else {
     return 4;
   }
+}
+
+function predictImageWithCNN(data) {
+  var final = [];
+  var flatData = []; //flattened array
+  for(var i = 0; i < data.length; i++)
+  {
+    flatData = newArr.concat(data[i]); //flattening 'data' into newArr
+  }
+
+  //instantiating model from json and buf files
+  var model = new KerasJS.Model({
+    filepaths: {
+      model: 'dist/model.json',
+      weights: 'dist/model_weights.buf',
+      metadata: 'dist/model_metadata.json'
+    },
+    gpu: true //MAY NEED TO CHANGE (NOT SURE REALLY)
+  });
+
+  //Ready the model.
+  model.ready()
+  .then(function() {
+    //This matches our input data with the input key (b/c Sequential Model)
+    var inputData = {
+      'input': new Float32Array(flatData)
+    };
+    // make predictions based on inputData
+    return model.predict(inputData);
+  })
+  .then(function(outputData) {
+    //Here we take the outputData and parse it to get a result.
+
+    var probs = outputData['output']; //Gets output data
+
+    //**********FOR MNIST DATA ONLY*********
+    //Self-explanatory code that simply finds digit most likely to have been
+    //the number that the user 'wrote'
+    var sum = 0;
+    var maxProbindex=0;
+
+    for (var i = 0; i < probs.length; i++) {
+      sum += probs[i];
+      console.log(probs[i]);
+      if (probs[i] > probs[maxProbindex]) {
+        maxProbindex = i;
+      }
+    }
+    console.log(maxProbindex);
+    //*****************************************
+
+    //TODO: Put in code to assign outPutData to 'final' so we can then convert it
+    //      This shuould not be too hard to do.
+
+  })
+  .catch(function(err) {
+    console.log(err);
+    // handle error
+  });
+
+  return final; //Returns nxmx1 array of vals 0-1.
+
 }
