@@ -6,6 +6,87 @@ previewNode.id = "";
 var previewTemplate = previewNode.parentNode.innerHTML;
 previewNode.parentNode.removeChild(previewNode);
 var currentImgIndex = 0;
+
+
+var data = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+var newArr = [];
+for(var i = 0; i < data.length; i++)
+{
+    newArr = newArr.concat(data[i]);
+}
+var model = new KerasJS.Model({
+  filepaths: {
+    model: 'dist/model.json',
+    weights: 'dist/model_weights.buf',
+    metadata: 'dist/model_metadata.json'
+  },
+  gpu: true
+});
+model.ready()
+  .then(function() {
+    console.log("1");
+    // input data object keyed by names of the input layers
+    // or `input` for Sequential models
+    // values are the flattened Float32Array data
+    // (input tensor shapes are specified in the model config)
+    var inputData = {
+      'input': new Float32Array(newArr)
+    };
+    console.log("2 " + inputData);
+    // make predictions
+    return model.predict(inputData);
+  })
+  .then(function(outputData) {
+    // outputData is an object keyed by names of the output layers
+    // or `output` for Sequential models
+    // e.g.,
+    // outputData['fc1000']
+    var probs = outputData['output'];
+    var sum = 0;
+    var maxProbindex=0;
+
+    for (var i = 0; i < probs.length; i++) {
+      sum += probs[i];
+      console.log(probs[i]);
+      if (probs[i] > probs[maxProbindex]) {
+        maxProbindex = i;
+      }
+    }
+    return (maxProbindex);
+
+  })
+  .catch(function(err) {
+    console.log(err);
+    // handle error
+  });
+
 //**********FILE INPUT METHODS***********************
 function handleFileSelect(evt, files) {
   var uploadedID = "uploaded";
@@ -84,7 +165,6 @@ function createImgSpace(index) {
   document.getElementById('download-btn' + index).addEventListener('click', function() {
       download(this, 'uploaded' + index , 'converted');
   }, false);
-  alert("Appended the Child");
 }
 
 //WARNING: THIS METHOD IS VERY SKETCHY AND SHOULD EVENTUALLY BE MADE BETTER
@@ -214,11 +294,15 @@ function getType(element) {
     return NULL;
   }
 }
-//*************UNCOMMENT OR FIX BELOW CODE ***********************
-
 
 //************CONVERTING METHODS*********************
 function convert(index) {
+
+
+  //alert(data.length + " x " + data[0].length);
+
+
+
   //  const scale = require('scale-color-perceptual');
   //Use "scale.viridis(t)" to get viridis color, where 0<t<1.
   //Works with inferno, magma, and plasma as well.
@@ -235,6 +319,7 @@ function convert(index) {
       imageData.data[i+1] = imageData.data[i+2];
       imageData.data[i+2] = place;
       imageData.data[i+3] = 255;
+
       //console.log(pixelData);
     }
     ctx.putImageData(imageData, 0, 0);
