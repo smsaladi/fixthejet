@@ -13,20 +13,23 @@ linArr = makeLinear(False, 0, 0, dim) #Middle 2 args dont matter for this
 linArrJump = makeLinear(True, 685, 30, dim)
 
 #Gaussian
-k = makeGaussian(dim, (dim[0]/2, dim[1]/2), dim[0] * 8)
+gauss = makeGaussian(dim, (dim[0]/2, dim[1]/2), dim[0] * 8)
 
 #Sinusoidal with linear multiplier
-x_arr = np.linspace(0, dim[0]-1, dim[0])
-y_arr = np.linspace(0, dim[1]-1, dim[1])
-final = [[0 for x in range(dim[0])] for y in range(dim[1])]
-for i in enumerate(x_arr):
-    for j in enumerate(y_arr):
-        x = i[1]
-        y = j[1]
-        factor = ((x * .5) + (dim[0] * .25)) / dim[0]
-        final[i[0]][j[0]] = math.sin(20 * x / dim[0]) * math.sin(16 * y / dim[1]) * factor
-final = np.array(final)
+sinuArr = makeSinu(dim)
 
+
+def makeSinu(dim):
+    x_arr = np.linspace(0, dim[0]-1, dim[0])
+    y_arr = np.linspace(0, dim[1]-1, dim[1])
+    final = [[0 for x in range(dim[0])] for y in range(dim[1])]
+    for i in enumerate(x_arr):
+        for j in enumerate(y_arr):
+            x = i[1]
+            y = j[1]
+            factor = 1-(((y * .5) + (dim[0] * .25)) / dim[0])
+            final[i[0]][j[0]] = (math.cos(20 * x / dim[0]) + math.sin(40 * y / dim[1])) * factor
+    return np.array(final)
 
 
 def makeLinear(hasDiscontinuity, position, length, dim):
