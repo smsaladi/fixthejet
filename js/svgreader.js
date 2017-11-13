@@ -78,17 +78,17 @@ function createImgSpace(index) {
   var inner = "<output class=\"imgs\" id=\"list" + index + "\"></output>" +
   "<div class=\"button-container\">" +
   "<button id=\"convert-btn\" class=\"btn btn-success\" onClick=\"convert(" + index + ")\">" +
-        "<span>Convert </span><i class=\"glyphicon glyphicon-flash\"></i></button>" +
+  "<span>Convert </span><i class=\"glyphicon glyphicon-flash\"></i></button>" +
   "<button id=\"download-btn" + index + "\" class=\"btn btn-info\">" +
-        "<span>Download </span><i class=\"glyphicon glyphicon-download\"></i></button>" +
+  "<span>Download </span><i class=\"glyphicon glyphicon-download\"></i></button>" +
   "<button id=\"delete-btn\" class =\"btn btn-danger delete\" onClick=\"del(" + index + ")\">" +
-        "<span>Delete </span><i class=\"glyphicon glyphicon-remove\"></i></button>" +
+  "<span>Delete </span><i class=\"glyphicon glyphicon-remove\"></i></button>" +
   "</div>";
 
   div.innerHTML = inner;
   document.getElementById('image-list').appendChild(div);
   document.getElementById('download-btn' + index).addEventListener('click', function() {
-      download(this, 'uploaded' + index , 'converted');
+    download(this, 'uploaded' + index , 'converted');
   }, false);
 }
 
@@ -231,9 +231,6 @@ function getType(element) {
 function convert(index) {
 
 
-  //alert(data.length + " x " + data[0].length);
-
-
 
   //  const scale = require('scale-color-perceptual');
   //Use "scale.viridis(t)" to get viridis color, where 0<t<1.
@@ -241,24 +238,104 @@ function convert(index) {
   var object = document.getElementById("uploaded" + index);
   var name = (object.nodeName).toUpperCase();
   if (name == "CANVAS") {
-    //Convert images using pretrained neural net model here.
     var ctx = object.getContext('2d');
-    var imageData = ctx.getImageData(0, 0, object.width, object.height);
+    var width = object.width;
+    var height = object.height;
+    var imageData = ctx.getImageData(0, 0, width, height);
+    var img = new Array(width);
+    // for (var i = 0; i < width; i++) {
+    //   var row = new Array(height);
+    //   for (var j = 0; j < height; j++) {
+    //
+    //     var index = ((width * i) + j) * 4;
+    //     row[j] = [imageData.data[index],
+    //     imageData.data[index + 1],
+    //     imageData.data[index + 2]];
+    //   }
+    //   img[i] = row;
+    // }
+    var lab_array = createLabJetArray();
+    var lastIndex = 0;
     for (var i = 0; i < imageData.data.length; i += 4) {
-      //console.log(pixel);
-      var place = imageData.data[i];
-      imageData.data[i] = imageData.data[i+1];
-      imageData.data[i+1] = imageData.data[i+2];
-      imageData.data[i+2] = place;
+      var pxl = new Array(3);
+      // imageData.data[i] = imageData.data[i+1];
+      // imageData.data[i+1] = imageData.data[i+2];
+      // imageData.data[i+2] = place;
+
+      pxl[0] = imageData[i];
+      pxl[1] = imageData[i+1];
+      pxl[2] = imageData[i+2];
+      //Convert pxl to lab color
+      console.log(imageData + " " + imageData[i]);
+      //console.log(pxl[0] + " " +  pxl[1] + " " + pxl[2]);
+      var lab = rgb2Lab(pxl);
+      var viridisColor;
+      var currentDistance;
+      if ((i / 4) % width == 0) {
+        currentDistance = getLabDistance(lab, lab_array[0]);
+        var j = lastIndex + 1;
+        while (getLabDistance(lab, lab_array[j]) < currentDistance && j < 256) {
+          currentDistance = getLabDistance(lab, lab_array[j]);
+          j++;
+        }
+        lastIndex = j;
+        viridisColor = viridis[j];
+      } else {
+        currentDistance = getLabDistance(lab, lab_array[lastIndex]);
+        if (lastIndex == 0) {
+          var j = lastIndex + 1;
+          while (getLabDistance(lab, lab_array[j]) < currentDistance && j < 256) {
+            currentDistance = getLabDistance(lab, lab_array[j]);
+            j++;
+          }
+          lastIndex = j;
+          viridisColor = viridis[j];
+        } else if (lastIndex == 255) {
+          var j = lastIndex - 1;
+          while (getLabDistance(lab, lab_array[j]) < currentDistance && j >= 0) {
+            currentDistance = getLabDistance(lab, lab_array[j]);
+            j--;
+          }
+          lastIndex = j;
+          viridisColor = viridis[j];
+        } else {
+          if (getLabDistance(lab, lab_array[j]) < getLabDistance(lab, lab_array[lastIndex + 1]) &&
+          getLabDistance(lab, lab_array[j]) < getLabDistance(lab, lab_array[lastIndex - 1])) {
+            lastIndex = j;
+            viridisColor = viridis[j];
+          } else if (getLabDistance(lab, lab_array[j - 1]) < getLabDistance(lab, lab_array[j+1])) {
+            var j = lastIndex - 1;
+            while (getLabDistance(lab, lab_array[j]) < currentDistance && j >= 0) {
+              currentDistance = getLabDistance(lab, lab_array[j]);
+              j--;
+            }
+            lastIndex = j;
+            viridisColor = viridis[j];
+          } else {
+            var j = lastIndex + 1;
+            while (getLabDistance(lab, lab_array[j]) < currentDistance && j < 256) {
+              currentDistance = getLabDistance(lab, lab_array[j]);
+              j++;
+            }
+            lastIndex = j;
+            viridisColor = viridis[j];
+          }
+        }
+      }
+
+      imageData.data[i] = hexToNumber(viridisColor.substring(1,3));
+      imageData.data[i + 1] = hexToNumber(viridisColor.substring(3,5));
+      imageData.data[i + 2] = hexToNumber(viridisColor.substring(5));
       imageData.data[i+3] = 255;
 
-      //console.log(pixelData);
     }
+    //console.log(imageData.data)
+    //console.log(arr.length);
+    //predictImageWithCNN(arr);
     ctx.putImageData(imageData, 0, 0);
-    console.log("done");
   } else if (name == "SVG") {
     var elements = object.getElementsByTagName('*');
-
+    var isRed = false;
     for (var i = 0; i < elements.length; i++) {
       var jetColor = elements[i].getAttribute('fill');
       var index = -1;
@@ -296,6 +373,7 @@ function convert(index) {
         //
         //Put code to notify user of invalid colors.
         //
+        isRed = true;
       }
       //alert(index);
       var viridisColor = viridis[index];
@@ -306,6 +384,10 @@ function convert(index) {
       } else if (elements[i].style.fill != "") {
         elements[i].style.fill = viridisColor;
       }
+    }
+    if (isRed) {
+      alert("Your image contains some path elements not in the jet colormaps." +
+      " We have colored those in red and converted the rest of the image");
     }
   }
 }
@@ -363,64 +445,152 @@ function jet_to_val(r, g, b) {
   }
 }
 
-function predictImageWithCNN(data) {
-  var final = [];
-  var flatData = []; //flattened array
-  for(var i = 0; i < data.length; i++)
-  {
-    flatData = newArr.concat(data[i]); //flattening 'data' into newArr
+function createLabJetArray() {
+  var lab_array = new Array(256);
+  var n = 0;
+  for (var i = 0; i < 256; i++) {
+    var r;
+    var g;
+    var b;
+    if (i < 0.125) {
+      r = 0;
+      g = 0;
+      b = 128+(4*i);
+    } else if (i < 0.375) {
+      r = 0;
+      g = -128 + (4*i);
+      b = 256;
+    } else if (i < 0.625) {
+      r = (-1.5 * 256) + (4 * i);
+      g = 1;
+      b = 2.5 - (4 * i);
+    } else if (i < 0.875) {
+      r = 1;
+      g = 3.5 - (4 * i);
+      b = 0;
+    } else {
+      r = 4.5 - (4 * i);
+      g = 0;
+      b = 0;
+    }
+    var lab = rgb2Lab([r,g,b]);
+    console.log(lab);
+    lab_array[n] = lab;
+    n++;
+  }
+  return lab_array;
+}
+
+
+
+function rgb2Lab(inputColor) {
+  var num = 0;
+  var RGB = [0,0,0];
+
+  for (var i = 0; i < inputColor.length; i++) {
+    var value = inputColor[i] / 255;
+    if (value >= .04045) {
+      value = Math.pow(((value + .055) / 1.055), 2.4);
+
+    } else {
+      value = value / 12.92;
+    }
+
+    RGB[num] = value * 100;
+    num++;
   }
 
-  //instantiating model from json and buf files
-  var model = new KerasJS.Model({
-    filepaths: {
-      model: 'dist/model.json',
-      weights: 'dist/model_weights.buf',
-      metadata: 'dist/model_metadata.json'
-    },
-    gpu: true //MAY NEED TO CHANGE (NOT SURE REALLY)
-  });
+  var XYZ = [0,0,0];
 
-  //Ready the model.
-  model.ready()
-  .then(function() {
-    //This matches our input data with the input key (b/c Sequential Model)
-    var inputData = {
-      'input': new Float32Array(flatData)
-    };
-    // make predictions based on inputData
-    return model.predict(inputData);
-  })
-  .then(function(outputData) {
-    //Here we take the outputData and parse it to get a result.
+  var X = RGB[0] * .4124 + RGB[1] * .3576 + RGB[2] * .1805;
+  var Y = RGB[0] * .2126 + RGB[1] * .7152 + RGB[2] * .0722;
+  var Z = RGB[0] * .0193 + RGB[1] * .1192 + RGB[2] * .9505;
+  XYZ[0] = Math.round(10000 * X) / 10000;
+  XYZ[1] = Math.round(10000 * Y) / 10000;
+  XYZ[2] = Math.round(10000 * Z) / 10000;
 
-    var probs = outputData['output']; //Gets output data
+  XYZ[0] /= 95.047;
+  XYZ[1] /= 100.0;
+  XYZ[2] /= 108.883;
 
-    //**********FOR MNIST DATA ONLY*********
-    //Self-explanatory code that simply finds digit most likely to have been
-    //the number that the user 'wrote'
-    var sum = 0;
-    var maxProbindex=0;
-
-    for (var i = 0; i < probs.length; i++) {
-      sum += probs[i];
-      console.log(probs[i]);
-      if (probs[i] > probs[maxProbindex]) {
-        maxProbindex = i;
-      }
+  for (var i = 0; i < XYZ.length; i++) {
+    if (XYZ[i] > .008856) {
+      value = Math.pow(value, 1/3);
+    } else {
+      value = (7.787 * value) + (16 / 116);
     }
-    console.log(maxProbindex);
-    //*****************************************
+    XYZ[i] = value;
+  }
 
-    //TODO: Put in code to assign outPutData to 'final' so we can then convert it
-    //      This shuould not be too hard to do.
+  var Lab = [0,0,0];
 
-  })
-  .catch(function(err) {
-    console.log(err);
-    // handle error
-  });
+  var L = (116 * XYZ[1]) - 16;
+  var a = 500 * (XYZ[0] - XYZ[1]);
+  var b = 200 * (XYZ[1] - XYZ[2]);
 
-  return final; //Returns nxmx1 array of vals 0-1.
-
+  Lab[0] = Math.round(10000 * L) / 10000;
+  Lab[1] = Math.round(10000 * a) / 10000;
+  Lab[2] = Math.round(10000 * b) / 10000;
+  //console.log(Lab[0] + " " + Lab[1] + " " + Lab[2]);
+  return Lab;
 }
+
+function getLabDistance(lab1, lab2) { // Simple linear distance formula in 3-space of lab color
+  return Math.sqrt(Math.pow(lab2[0]-lab1[0]), 2)
+  + Math.pow((lab2[1]-lab1[1]), 2)
+  + Math.pow((lab2[2]-lab1[2]), 2);
+}
+
+// function predictImageWithCNN(data) {
+//   var final = [];
+//   //instantiating model from json and buf files
+//   var model = new KerasJS.Model({
+//     filepaths: {
+//       model: 'dist/model.json',
+//       weights: 'dist/model_weights.buf',
+//       metadata: 'dist/model_metadata.json'
+//     },
+//     gpu: true //MAY NEED TO CHANGE (NOT SURE REALLY)
+//   });
+//
+//   //Ready the model.
+//   model.ready()
+//   .then(function() {
+//     //This matches our input data with the input key (b/c Sequential Model)
+//     var inputData = {
+//       'input_1': new Float32Array(data)
+//     };
+//     // make predictions based on inputData
+//     return model.predict(inputData);
+//   })
+//   .then(function(outputData) {
+//     //Here we take the outputData and parse it to get a result.
+//
+//     var probs = outputData['output']; //Gets output data
+//
+//     //**********FOR MNIST DATA ONLY*********
+//     //Self-explanatory code that simply finds digit most likely to have been
+//     //the number that the user 'wrote'
+//     // var sum = 0;
+//     // var maxProbindex=0;
+//     //
+//     // for (var i = 0; i < probs.length; i++) {
+//     //   sum += probs[i];
+//     //   console.log(probs[i]);
+//     //   if (probs[i] > probs[maxProbindex]) {
+//     //     maxProbindex = i;
+//     //   }
+//     // }
+//     // console.log(maxProbindex);
+//     //*****************************************
+//     console.log(probs);
+//     //TODO: Put in code to assign outPutData to 'final' so we can then convert it
+//     //      This shuould not be too hard to do.
+//
+//   })
+//   .catch(function(err) {
+//     console.log(err);
+//     // handle error
+//   });
+//   return final; //Returns nxmx1 array of vals 0-1.
+// }
