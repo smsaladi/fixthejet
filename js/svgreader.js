@@ -326,7 +326,7 @@ function convert(index) {
       imageData.data[i] = hexToNumber(viridisColor.substring(1,3));
       imageData.data[i + 1] = hexToNumber(viridisColor.substring(3,5));
       imageData.data[i + 2] = hexToNumber(viridisColor.substring(5));
-      imageData.data[i+3] = 255;
+      //imageData.data[i+3] = 255;
 
     }
     //console.log(imageData.data)
