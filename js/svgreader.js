@@ -174,8 +174,8 @@ function download(link, canvasID, filename) {
       type: type
     });
     url = URL.createObjectURL(file);
-  } else if (type == "image/png") {
     filename += ".png";
+  } else if (type == "image/png") {
     var canvas = element.childNodes[0];
     url = canvas.toDataURL();
     file = new Blob([url],{
@@ -200,7 +200,7 @@ function download(link, canvasID, filename) {
       window.URL.revokeObjectURL(url);
     }, 0);
   }
-  console.log("Done");
+  //console.log("Done");
 
 }
 
@@ -217,7 +217,7 @@ function getType(element) {
     }
   }
   name = name.toUpperCase();
-  console.log(name);
+  //console.log(name);
   if (name == "CANVAS") {
     return "image/png";
   } else if (name == "SVG") {
@@ -243,85 +243,85 @@ function convert(index) {
     var height = object.height;
     var imageData = ctx.getImageData(0, 0, width, height);
     var img = new Array(width);
-    // for (var i = 0; i < width; i++) {
-    //   var row = new Array(height);
-    //   for (var j = 0; j < height; j++) {
-    //
-    //     var index = ((width * i) + j) * 4;
-    //     row[j] = [imageData.data[index],
-    //     imageData.data[index + 1],
-    //     imageData.data[index + 2]];
-    //   }
-    //   img[i] = row;
-    // }
     var lab_array = createLabJetArray();
     var lastIndex = 0;
+    console.log(width);
     for (var i = 0; i < imageData.data.length; i += 4) {
       var pxl = new Array(3);
       // imageData.data[i] = imageData.data[i+1];
       // imageData.data[i+1] = imageData.data[i+2];
       // imageData.data[i+2] = place;
 
-      pxl[0] = imageData[i];
-      pxl[1] = imageData[i+1];
-      pxl[2] = imageData[i+2];
+      pxl[0] = imageData.data[i];
+      pxl[1] = imageData.data[i+1];
+      pxl[2] = imageData.data[i+2];
+
+      //console.log(pxl);
       //Convert pxl to lab color
-      console.log(imageData + " " + imageData[i]);
-      //console.log(pxl[0] + " " +  pxl[1] + " " + pxl[2]);
       var lab = rgb2Lab(pxl);
+      // if (pxl[0] != 255) {
+      //   console.log(lab);
+      // }
       var viridisColor;
       var currentDistance;
-      if ((i / 4) % width == 0) {
-        currentDistance = getLabDistance(lab, lab_array[0]);
-        var j = lastIndex + 1;
-        while (getLabDistance(lab, lab_array[j]) < currentDistance && j < 256) {
-          currentDistance = getLabDistance(lab, lab_array[j]);
-          j++;
-        }
-        lastIndex = j;
-        viridisColor = viridis[j];
-      } else {
-        currentDistance = getLabDistance(lab, lab_array[lastIndex]);
-        if (lastIndex == 0) {
-          var j = lastIndex + 1;
-          while (getLabDistance(lab, lab_array[j]) < currentDistance && j < 256) {
-            currentDistance = getLabDistance(lab, lab_array[j]);
-            j++;
-          }
-          lastIndex = j;
-          viridisColor = viridis[j];
-        } else if (lastIndex == 255) {
-          var j = lastIndex - 1;
-          while (getLabDistance(lab, lab_array[j]) < currentDistance && j >= 0) {
-            currentDistance = getLabDistance(lab, lab_array[j]);
-            j--;
-          }
-          lastIndex = j;
-          viridisColor = viridis[j];
-        } else {
-          if (getLabDistance(lab, lab_array[j]) < getLabDistance(lab, lab_array[lastIndex + 1]) &&
-          getLabDistance(lab, lab_array[j]) < getLabDistance(lab, lab_array[lastIndex - 1])) {
-            lastIndex = j;
-            viridisColor = viridis[j];
-          } else if (getLabDistance(lab, lab_array[j - 1]) < getLabDistance(lab, lab_array[j+1])) {
-            var j = lastIndex - 1;
-            while (getLabDistance(lab, lab_array[j]) < currentDistance && j >= 0) {
-              currentDistance = getLabDistance(lab, lab_array[j]);
-              j--;
-            }
-            lastIndex = j;
-            viridisColor = viridis[j];
-          } else {
-            var j = lastIndex + 1;
-            while (getLabDistance(lab, lab_array[j]) < currentDistance && j < 256) {
-              currentDistance = getLabDistance(lab, lab_array[j]);
-              j++;
-            }
-            lastIndex = j;
-            viridisColor = viridis[j];
-          }
+      var j = 255;
+      var num = 0;
+      var lowestDistance = getLabDistance(lab, lab_array[255]);
+      for ( var k = 255; k >= 0; k--) {
+        if (getLabDistance(lab_array[k], lab) < lowestDistance) {
+          lowestDistance = getLabDistance(lab_array[k], lab);
+          j = k;
         }
       }
+
+      // if ((i / 4) % width == 0) {
+        // If first in column, find best color from scratch
+        // currentDistance = getLabDistance(lab, lab_array[0]);
+       // j = 1;
+       //  while (getLabDistance(lab, lab_array[j]) < currentDistance && j < 256) {
+       //    currentDistance = getLabDistance(lab, lab_array[j]);
+       //    j++;
+       //  }
+      // } else { //if not first in the row
+      //   currentDistance = getLabDistance(lab, lab_array[lastIndex]); // Use previous best index
+      //   if (lastIndex == 0) { // if we are at the first index, only look at greater indices
+      //     j = lastIndex + 1;
+      //     while (getLabDistance(lab, lab_array[j]) < currentDistance && j < 256) {
+      //       currentDistance = getLabDistance(lab, lab_array[j]);
+      //       j++;
+      //     }
+      //   } else if (lastIndex == 255) { // if we are at the last index, only look at smaller ones.
+      //     j = lastIndex - 1;
+      //     while (getLabDistance(lab, lab_array[j]) < currentDistance && j >= 0) {
+      //       currentDistance = getLabDistance(lab, lab_array[j]);
+      //       j--;
+      //     }
+      //   } else { // If not at the endpoints of labscale (will probably go here).
+      //     //
+      //     if (getLabDistance(lab, lab_array[lastIndex]) < getLabDistance(lab, lab_array[lastIndex + 1]) && //If the previous distance is best, use it again.
+      //     getLabDistance(lab, lab_array[lastIndex]) < getLabDistance(lab, lab_array[lastIndex - 1])) {
+      //       //Do nothing, keep lastIndex
+      //
+      //     } else if (getLabDistance(lab, lab_array[lastIndex - 1]) < getLabDistance(lab, lab_array[lastIndex + 1])) { //Go to lower indices
+      //       j = lastIndex - 1;
+      //       while (getLabDistance(lab, lab_array[j]) < currentDistance && j >= 0) {
+      //         currentDistance = getLabDistance(lab, lab_array[j]);
+      //         j--;
+      //       }
+      //     } else { // Go to higher indices
+      //       j = lastIndex + 1;
+      //       while (getLabDistance(lab, lab_array[j]) < currentDistance && j < 256) {
+      //         currentDistance = getLabDistance(lab, lab_array[j]);
+      //         j++;
+      //       }
+      //     }
+      //     //
+      //   }
+      //
+      // }
+      //console.log(j);
+      viridisColor = viridis[j];
+      lastIndex = j;
 
       imageData.data[i] = hexToNumber(viridisColor.substring(1,3));
       imageData.data[i + 1] = hexToNumber(viridisColor.substring(3,5));
@@ -393,7 +393,8 @@ function convert(index) {
 }
 //document.getElementById("convert-btn").onclick = convert;
 //
-function hexToNumber(hex) {
+function hexToNumber(hex) { //Takes in a string of length two and converts to 0-255
+  hex = hex.toUpperCase();
   return (16 * sixteenBitToDec(hex.charAt(0))) + (sixteenBitToDec(hex.charAt(1)));
 }
 //
@@ -448,20 +449,20 @@ function jet_to_val(r, g, b) {
 function createLabJetArray() {
   var lab_array = new Array(256);
   var n = 0;
-  for (var i = 0; i < 256; i++) {
+  for (var i = 0; i < 1; i+= 1/256) {
     var r;
     var g;
     var b;
-    if (i < 0.125) {
+    if (i < .125) {
       r = 0;
       g = 0;
-      b = 128+(4*i);
+      b = .5+(4*i);
     } else if (i < 0.375) {
       r = 0;
-      g = -128 + (4*i);
-      b = 256;
+      g = -.5 + (4*i);
+      b = 1;
     } else if (i < 0.625) {
-      r = (-1.5 * 256) + (4 * i);
+      r = (-1.5) + (4 * i);
       g = 1;
       b = 2.5 - (4 * i);
     } else if (i < 0.875) {
@@ -473,8 +474,8 @@ function createLabJetArray() {
       g = 0;
       b = 0;
     }
-    var lab = rgb2Lab([r,g,b]);
-    console.log(lab);
+    var lab = rgb2Lab([Math.round(255 * r),Math.round(g*255),Math.round(b*255)]);
+    //console.log(lab);
     lab_array[n] = lab;
     n++;
   }
@@ -499,7 +500,6 @@ function rgb2Lab(inputColor) {
     RGB[num] = value * 100;
     num++;
   }
-
   var XYZ = [0,0,0];
 
   var X = RGB[0] * .4124 + RGB[1] * .3576 + RGB[2] * .1805;
@@ -508,20 +508,16 @@ function rgb2Lab(inputColor) {
   XYZ[0] = Math.round(10000 * X) / 10000;
   XYZ[1] = Math.round(10000 * Y) / 10000;
   XYZ[2] = Math.round(10000 * Z) / 10000;
-
   XYZ[0] /= 95.047;
   XYZ[1] /= 100.0;
   XYZ[2] /= 108.883;
-
   for (var i = 0; i < XYZ.length; i++) {
     if (XYZ[i] > .008856) {
-      value = Math.pow(value, 1/3);
+      XYZ[i] = Math.pow(XYZ[i], 1/3);
     } else {
-      value = (7.787 * value) + (16 / 116);
+      XYZ[i] = (7.787 * XYZ[i]) + (16 / 116);
     }
-    XYZ[i] = value;
   }
-
   var Lab = [0,0,0];
 
   var L = (116 * XYZ[1]) - 16;
@@ -532,13 +528,14 @@ function rgb2Lab(inputColor) {
   Lab[1] = Math.round(10000 * a) / 10000;
   Lab[2] = Math.round(10000 * b) / 10000;
   //console.log(Lab[0] + " " + Lab[1] + " " + Lab[2]);
+  //console.log(Lab);
   return Lab;
 }
 
 function getLabDistance(lab1, lab2) { // Simple linear distance formula in 3-space of lab color
-  return Math.sqrt(Math.pow(lab2[0]-lab1[0]), 2)
-  + Math.pow((lab2[1]-lab1[1]), 2)
-  + Math.pow((lab2[2]-lab1[2]), 2);
+  return Math.sqrt(Math.pow(lab2[0]-lab1[0], 2)
+  + Math.pow(lab2[1]-lab1[1], 2)
+  + Math.pow(lab2[2]-lab1[2], 2));
 }
 
 // function predictImageWithCNN(data) {
