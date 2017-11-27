@@ -263,52 +263,51 @@ function convert(index) {
       //Convert pxl to lab color
       var lab = rgb2Lab(pxl);
       var j = 0;
-      var lowestDistance = getLabDistance(lab, lab_array[0]);
+      var lowestDistance = euclideanDist(lab, lab_array[0]);
       for ( var k = 0; k < 256; k++) {
-        if (getLabDistance(lab_array[k], lab) < lowestDistance) {
-          lowestDistance = getLabDistance(lab_array[k], lab);
-          j = k;
+        if (euclideanDist(lab_array[k], lab) < lowestDistance) {
+          lowestDistance = euclideanDist(lab_array[k], lab);          j = k;
         }
       }
 
       // if ((i / 4) % width == 0) {
       //   //If first in column, find best color from scratch
-      //   currentDistance = getLabDistance(lab, lab_array[0]);
+      //   currentDistance = euclideanDist(lab, lab_array[0]);
       //  j = 0;
-      //   while (getLabDistance(lab, lab_array[j]) < currentDistance && j < 255) {
-      //     currentDistance = getLabDistance(lab, lab_array[j]);
+      //   while (euclideanDist(lab, lab_array[j]) < currentDistance && j < 255) {
+      //     currentDistance = euclideanDist(lab, lab_array[j]);
       //     j++;
       //   }
       // } else { //if not first in the row
-      //   currentDistance = getLabDistance(lab, lab_array[lastIndex]); // Use previous best index
+      //   currentDistance = euclidean_dist(lab, lab_array[lastIndex]); // Use previous best index
       //   if (lastIndex == 0) { // if we are at the first index, only look at greater indices
       //     j = lastIndex + 1;
-      //     while (getLabDistance(lab, lab_array[j]) < currentDistance && j < 255) {
-      //       currentDistance = getLabDistance(lab, lab_array[j]);
+      //     while (euclideanDist(lab, lab_array[j]) < currentDistance && j < 255) {
+      //       currentDistance = euclideanDist(lab, lab_array[j]);
       //       j++;
       //     }
       //   } else if (lastIndex == 255) { // if we are at the last index, only look at smaller ones.
       //     j = lastIndex - 1;
-      //     while (j > 0 && getLabDistance(lab, lab_array[j]) < currentDistance ) {
-      //       currentDistance = getLabDistance(lab, lab_array[j]);
+      //     while (j > 0 && euclideanDist(lab, lab_array[j]) < currentDistance ) {
+      //       currentDistance = euclideanDist(lab, lab_array[j]);
       //       j--;
       //     }
       //   } else { // If not at the endpoints of labscale (will probably go here).
       //     //
-      //     if (getLabDistance(lab, lab_array[lastIndex]) < getLabDistance(lab, lab_array[lastIndex + 1]) && //If the previous distance is best, use it again.
-      //     getLabDistance(lab, lab_array[lastIndex]) < getLabDistance(lab, lab_array[lastIndex - 1])) {
+      //     if (euclidean_dist(lab, lab_array[lastIndex]) < euclidean_dist(lab, lab_array[lastIndex + 1]) && //If the previous distance is best, use it again.
+      //     euclidean_dist(lab, lab_array[lastIndex]) < euclidean_dist(lab, lab_array[lastIndex - 1])) {
       //       //Do nothing, keep lastIndex
       //
-      //     } else if (getLabDistance(lab, lab_array[lastIndex - 1]) < getLabDistance(lab, lab_array[lastIndex + 1])) { //Go to lower indices
+      //     } else if (euclidean_dist(lab, lab_array[lastIndex - 1]) < euclidean_dist(lab, lab_array[lastIndex + 1])) { //Go to lower indices
       //       j = lastIndex - 1;
-      //       while (j > 0 && getLabDistance(lab, lab_array[j]) < currentDistance) {
-      //         currentDistance = getLabDistance(lab, lab_array[j]);
+      //       while (j > 0 && euclideanDist(lab, lab_array[j]) < currentDistance) {
+      //         currentDistance = euclideanDist(lab, lab_array[j]);
       //         j--;
       //       }
       //     } else { // Go to higher indices
       //       j = lastIndex + 1;
-      //       while (j < 255 && getLabDistance(lab, lab_array[j]) < currentDistance) {
-      //         currentDistance = getLabDistance(lab, lab_array[j]);
+      //       while (j < 255 && euclideanDist(lab, lab_array[j]) < currentDistance) {
+      //         currentDistance = euclideanDist(lab, lab_array[j]);
       //         j++;
       //       }
       //     }
@@ -319,14 +318,14 @@ function convert(index) {
       //console.log(j);
       if (i < 30) {
         console.log(j + ",  " + lastIndex);
-        console.log(getLabDistance(lab, lab_array[j])  + ",  " + getLabDistance(lab, lab_array[lastIndex]));
+        console.log(euclideanDist(lab, lab_array[j])  + ",  " + euclideanDist(lab, lab_array[lastIndex]));
       }
       viridisColor = viridis[j];
       lastIndex = j;
       var black = rgb2Lab([0,0,0]);
       var white = rgb2Lab([255,255,255]);
-      if (getLabDistance(black, lab) > getLabDistance(lab, lab_array[j]) &&
-          getLabDistance(white, lab) > getLabDistance(lab, lab_array[j])) {
+      if (euclideanDist(black, lab) > euclideanDist(lab, lab_array[j]) &&
+          euclideanDist(white, lab) > euclideanDist(lab, lab_array[j])) {
         imageData.data[i] = hexToNumber(viridisColor.substring(1,3));
         imageData.data[i + 1] = hexToNumber(viridisColor.substring(3,5));
         imageData.data[i + 2] = hexToNumber(viridisColor.substring(5));
@@ -536,10 +535,17 @@ function rgb2Lab(inputColor) {
   return Lab;
 }
 
-function getLabDistance(lab1, lab2) { // Simple linear distance formula in 3-space of lab color
-  return Math.sqrt(Math.pow(lab2[0]-lab1[0], 2)
-  + Math.pow(lab2[1]-lab1[1], 2)
-  + Math.pow(lab2[2]-lab1[2], 2));
+/**
+ * Simple Euclidean distance for 3 dimensions
+ *
+ * @param {number[]} a
+ * @param {number[]} b
+ * @returns {number}
+ */
+function euclideanDist(a, b) { //
+  return Math.sqrt(Math.pow(a[0] - b[0], 2)
+                 + Math.pow(a[1] - b[1], 2)
+                 + Math.pow(a[2] - b[2], 2));
 }
 
 // function predictImageWithCNN(data) {
