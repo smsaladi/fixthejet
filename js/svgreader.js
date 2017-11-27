@@ -44,11 +44,11 @@ function handleFileSelect(evt, files) {
           canvas.id = uploadedID + index;
           obj.appendChild(canvas);
           context = canvas.getContext('2d');
-          var image = new Image();//document.createElement("IMG");
+          var image = new Image(); //document.createElement("IMG");
           //image.height = 200;
           //image.id = uploadedID;
           image.src = data;
-          image.onload = function(){
+          image.onload = function() {
             canvas.width = image.width;
             canvas.height = image.height;
             context.drawImage(image, 0, 0);
@@ -56,8 +56,7 @@ function handleFileSelect(evt, files) {
 
         }
         document.getElementById('list' + index).insertBefore(obj, null);
-      }
-      ;
+      };
     })(f);
 
     // Read in the image file as a data URL.
@@ -73,22 +72,22 @@ function handleFileSelect(evt, files) {
 function createImgSpace(index) {
   var div = document.createElement('DIV');
   var workerNum = "worker" + index;
-  div.className="worker";
-  div.id=workerNum;
+  div.className = "worker";
+  div.id = workerNum;
   var inner = "<output class=\"imgs\" id=\"list" + index + "\"></output>" +
-  "<div class=\"button-container\">" +
-  "<button id=\"convert-btn\" class=\"btn btn-success\" onClick=\"convert(" + index + ")\">" +
-  "<span>Convert </span><i class=\"glyphicon glyphicon-flash\"></i></button>" +
-  "<button id=\"download-btn" + index + "\" class=\"btn btn-info\">" +
-  "<span>Download </span><i class=\"glyphicon glyphicon-download\"></i></button>" +
-  "<button id=\"delete-btn\" class =\"btn btn-danger delete\" onClick=\"del(" + index + ")\">" +
-  "<span>Delete </span><i class=\"glyphicon glyphicon-remove\"></i></button>" +
-  "</div>";
+    "<div class=\"button-container\">" +
+    "<button id=\"convert-btn\" class=\"btn btn-success\" onClick=\"convert(" + index + ")\">" +
+    "<span>Convert </span><i class=\"glyphicon glyphicon-flash\"></i></button>" +
+    "<button id=\"download-btn" + index + "\" class=\"btn btn-info\">" +
+    "<span>Download </span><i class=\"glyphicon glyphicon-download\"></i></button>" +
+    "<button id=\"delete-btn\" class =\"btn btn-danger delete\" onClick=\"del(" + index + ")\">" +
+    "<span>Delete </span><i class=\"glyphicon glyphicon-remove\"></i></button>" +
+    "</div>";
 
   div.innerHTML = inner;
   document.getElementById('image-list').appendChild(div);
   document.getElementById('download-btn' + index).addEventListener('click', function() {
-    download(this, 'uploaded' + index , 'converted');
+    download(this, 'uploaded' + index, 'converted');
   }, false);
 }
 
@@ -131,27 +130,23 @@ dropZone.ondrop = function(evt) {
   //startUpload(e.dataTransfer.files);
   handleFileSelect(evt, evt.dataTransfer.files);
 
-}
-;
+};
 
 dropZone.ondragover = function() {
   this.className = 'upload-drop-zone drop';
   return false;
-}
-;
+};
 
 dropZone.ondragleave = function() {
   this.className = 'upload-drop-zone';
   return false;
-}
-;
+};
 
 dropZone.onclick = function() {
   var uploadFiles = document.getElementById('drop-zone').files;
   //e.preventDefault();
   //alert("Clicked");
-}
-;
+};
 
 function del(index) {
   var list = document.getElementById("image-list");
@@ -170,7 +165,7 @@ function download(link, canvasID, filename) {
   if (type == "image/svg+xml") {
     data = element.innerHTML;
 
-    file = new Blob([data],{
+    file = new Blob([data], {
       type: type
     });
     url = URL.createObjectURL(file);
@@ -178,7 +173,7 @@ function download(link, canvasID, filename) {
   } else if (type == "image/png") {
     var canvas = element.childNodes[0];
     url = canvas.toDataURL();
-    file = new Blob([url],{
+    file = new Blob([url], {
       type: type
     });
   }
@@ -256,17 +251,18 @@ function convert(index) {
       // imageData.data[i+2] = place;
 
       pxl[0] = imageData.data[i];
-      pxl[1] = imageData.data[i+1];
-      pxl[2] = imageData.data[i+2];
+      pxl[1] = imageData.data[i + 1];
+      pxl[2] = imageData.data[i + 2];
 
       //console.log(pxl);
       //Convert pxl to lab color
       var lab = sRGBToLab(pxl);
       var j = 0;
       var lowestDistance = euclideanDist(lab, lab_array[0]);
-      for ( var k = 0; k < 256; k++) {
+      for (var k = 0; k < 256; k++) {
         if (euclideanDist(lab_array[k], lab) < lowestDistance) {
-          lowestDistance = euclideanDist(lab_array[k], lab);          j = k;
+          lowestDistance = euclideanDist(lab_array[k], lab);
+          j = k;
         }
       }
 
@@ -318,16 +314,16 @@ function convert(index) {
       //console.log(j);
       if (i < 30) {
         console.log(j + ",  " + lastIndex);
-        console.log(euclideanDist(lab, lab_array[j])  + ",  " + euclideanDist(lab, lab_array[lastIndex]));
+        console.log(euclideanDist(lab, lab_array[j]) + ",  " + euclideanDist(lab, lab_array[lastIndex]));
       }
       viridisColor = viridis[j];
       lastIndex = j;
-      var black = sRGBToLab([0,0,0]);
-      var white = sRGBToLab([255,255,255]);
+      var black = sRGBToLab([0, 0, 0]);
+      var white = sRGBToLab([255, 255, 255]);
       if (euclideanDist(black, lab) > euclideanDist(lab, lab_array[j]) &&
-          euclideanDist(white, lab) > euclideanDist(lab, lab_array[j])) {
-        imageData.data[i] = hexToNumber(viridisColor.substring(1,3));
-        imageData.data[i + 1] = hexToNumber(viridisColor.substring(3,5));
+        euclideanDist(white, lab) > euclideanDist(lab, lab_array[j])) {
+        imageData.data[i] = hexToNumber(viridisColor.substring(1, 3));
+        imageData.data[i + 1] = hexToNumber(viridisColor.substring(3, 5));
         imageData.data[i + 2] = hexToNumber(viridisColor.substring(5));
         //imageData.data[i+3] = 255;
       }
@@ -390,7 +386,7 @@ function convert(index) {
     }
     if (isRed) {
       alert("Your image contains some path elements not in the jet colormaps." +
-      " We have colored those in red and converted the rest of the image");
+        " We have colored those in red and converted the rest of the image");
     }
   }
 }
@@ -405,19 +401,19 @@ function hexToNumber(hex) { //Takes in a string of length two and converts to 0-
 function sixteenBitToDec(bit) {
   switch (bit) {
     case 'A':
-    return 10;
+      return 10;
     case 'B':
-    return 11;
+      return 11;
     case 'C':
-    return 12;
+      return 12;
     case 'D':
-    return 13;
+      return 13;
     case 'E':
-    return 14;
+      return 14;
     case 'F':
-    return 15;
+      return 15;
     default:
-    return parseInt(bit);
+      return parseInt(bit);
   }
 }
 
@@ -430,13 +426,13 @@ function jet_to_val(r, g, b) {
     return b / 4 - 1 / 8;
   } else if (b == 1) {
     if (r != 0)
-    return -1;
+      return -1;
     return g / 4 + 1 / 8;
   } else if (g == 1) {
     return r / 4 + 3 / 8;
   } else if (r == 1) {
     if (b != 0)
-    return -1;
+      return -1;
     return -g / 4 + 7 / 8;
   } else if (g == 0 && b == 0) {
     return -r / 4 + 9 / 8;
@@ -452,17 +448,17 @@ function jet_to_val(r, g, b) {
 function createLabJetArray() {
   var lab_array = new Array(256);
   var n = 0;
-  for (var i = 0; i < 1; i+= 1/256) {
+  for (var i = 0; i < 1; i += 1 / 256) {
     var r;
     var g;
     var b;
     if (i < .125) {
       r = 0;
       g = 0;
-      b = .5+(4*i);
+      b = .5 + (4 * i);
     } else if (i < 0.375) {
       r = 0;
-      g = -.5 + (4*i);
+      g = -.5 + (4 * i);
       b = 1;
     } else if (i < 0.625) {
       r = (-1.5) + (4 * i);
@@ -477,7 +473,7 @@ function createLabJetArray() {
       g = 0;
       b = 0;
     }
-    var lab = sRGBToLab([Math.round(255 * r),Math.round(g*255),Math.round(b*255)]);
+    var lab = sRGBToLab([Math.round(255 * r), Math.round(g * 255), Math.round(b * 255)]);
     //console.log(lab);
     lab_array[n] = lab;
     n++;
@@ -519,7 +515,7 @@ function sRGBToLab(sRGB, bitDepth = 8) {
   ];
 
   for (var i = 0; i < 3; i++)
-      cieXYZ[i] = Math.round(10000 * cieXYZ[i]) / 10000;
+    cieXYZ[i] = Math.round(10000 * cieXYZ[i]) / 10000;
 
   // account for standard illuminant of sRGB
   // Observer: 2°, Illuminant: D65
@@ -530,9 +526,9 @@ function sRGBToLab(sRGB, bitDepth = 8) {
   // convert to CIEL*a*b* 1976 [L, a, b]
   for (var i = 0; i < 3; i++)
     if (cieXYZ[i] > .008856)
-      cieXYZ[i] = Math.pow(cieXYZ[i], 1/3);
+      cieXYZ[i] = Math.pow(cieXYZ[i], 1 / 3);
     else
-      cieXYZ[i] = 7.787 * cieXYZ[i] + 16/116;
+      cieXYZ[i] = 7.787 * cieXYZ[i] + 16 / 116;
 
   var cieLab = [0, 0, 0];
   cieLab[0] = 116 * cieXYZ[1] - 16;
@@ -540,7 +536,7 @@ function sRGBToLab(sRGB, bitDepth = 8) {
   cieLab[2] = 200 * (cieXYZ[1] - cieXYZ[2]);
 
   for (var i = 0; i < 3; i++)
-      cieLab[i] = Math.round(10000 * cieLab[i]) / 10000;
+    cieLab[i] = Math.round(10000 * cieLab[i]) / 10000;
 
   return cieLab;
 }
@@ -552,10 +548,10 @@ function sRGBToLab(sRGB, bitDepth = 8) {
  * @param {number[]} b
  * @returns {number}
  */
-function euclideanDist(a, b) { //
-  return Math.sqrt(Math.pow(a[0] - b[0], 2)
-                 + Math.pow(a[1] - b[1], 2)
-                 + Math.pow(a[2] - b[2], 2));
+function euclideanDist(a, b) {
+  return Math.sqrt(Math.pow(a[0] - b[0], 2) +
+                   Math.pow(a[1] - b[1], 2) +
+                   Math.pow(a[2] - b[2], 2));
 }
 
 // function predictImageWithCNN(data) {
