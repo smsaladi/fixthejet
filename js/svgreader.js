@@ -261,7 +261,7 @@ function convert(index) {
 
       //console.log(pxl);
       //Convert pxl to lab color
-      var lab = rgb2Lab(pxl);
+      var lab = sRGBToLab(pxl);
       var j = 0;
       var lowestDistance = euclideanDist(lab, lab_array[0]);
       for ( var k = 0; k < 256; k++) {
@@ -322,8 +322,8 @@ function convert(index) {
       }
       viridisColor = viridis[j];
       lastIndex = j;
-      var black = rgb2Lab([0,0,0]);
-      var white = rgb2Lab([255,255,255]);
+      var black = sRGBToLab([0,0,0]);
+      var white = sRGBToLab([255,255,255]);
       if (euclideanDist(black, lab) > euclideanDist(lab, lab_array[j]) &&
           euclideanDist(white, lab) > euclideanDist(lab, lab_array[j])) {
         imageData.data[i] = hexToNumber(viridisColor.substring(1,3));
@@ -477,7 +477,7 @@ function createLabJetArray() {
       g = 0;
       b = 0;
     }
-    var lab = rgb2Lab([Math.round(255 * r),Math.round(g*255),Math.round(b*255)]);
+    var lab = sRGBToLab([Math.round(255 * r),Math.round(g*255),Math.round(b*255)]);
     //console.log(lab);
     lab_array[n] = lab;
     n++;
@@ -486,53 +486,63 @@ function createLabJetArray() {
 }
 
 
+/**
+ * Convert an sRGB color to CIEL*a*b* 1976, i.e. "Lab"
+ * Based on Python code given here: https://stackoverflow.com/a/16020102
+ *
+ * @param {number[]} sRGB
+ * @param {number} [bitDepth]
+ * @returns {number[]}
+ */
+function sRGBToLab(sRGB, bitDepth = 8) {
+  var valueRange = Math.pow(2, bitDepth) - 1;
 
-function rgb2Lab(inputColor) {
-  var num = 0;
-  var RGB = [0,0,0];
+  // convert to RGB linear values [R_linear, G_linear, B_linear]
+  var RGBLin = [0, 0, 0];
+  for (var i = 0; i < 3; i++) {
+    RGBLin[i] = sRGB[i] / valueRange;
 
-  for (var i = 0; i < inputColor.length; i++) {
-    var value = inputColor[i] / 255;
-    if (value >= .04045) {
-      value = Math.pow(((value + .055) / 1.055), 2.4);
+    // gamma correction
+    if (RGBLin[i] >= .04045)
+      RGBLin[i] = Math.pow((RGBLin[i] + .055) / 1.055, 2.4);
+    else
+      RGBLin[i] /= 12.92;
 
-    } else {
-      value = value / 12.92;
-    }
-
-    RGB[num] = value * 100;
-    num++;
+    RGBLin[i] *= 100;
   }
-  var XYZ = [0,0,0];
 
-  var X = RGB[0] * .4124 + RGB[1] * .3576 + RGB[2] * .1805;
-  var Y = RGB[0] * .2126 + RGB[1] * .7152 + RGB[2] * .0722;
-  var Z = RGB[0] * .0193 + RGB[1] * .1192 + RGB[2] * .9505;
-  XYZ[0] = Math.round(10000 * X) / 10000;
-  XYZ[1] = Math.round(10000 * Y) / 10000;
-  XYZ[2] = Math.round(10000 * Z) / 10000;
-  XYZ[0] /= 95.047;
-  XYZ[1] /= 100.0;
-  XYZ[2] /= 108.883;
-  for (var i = 0; i < XYZ.length; i++) {
-    if (XYZ[i] > .008856) {
-      XYZ[i] = Math.pow(XYZ[i], 1/3);
-    } else {
-      XYZ[i] = (7.787 * XYZ[i]) + (16 / 116);
-    }
-  }
-  var Lab = [0,0,0];
+  // convert to CIEXYZ [X, Y, Z]
+  var cieXYZ = [
+    RGBLin[0] * .4124 + RGBLin[1] * .3576 + RGBLin[2] * .1805,
+    RGBLin[0] * .2126 + RGBLin[1] * .7152 + RGBLin[2] * .0722,
+    RGBLin[0] * .0193 + RGBLin[1] * .1192 + RGBLin[2] * .9505
+  ];
 
-  var L = (116 * XYZ[1]) - 16;
-  var a = 500 * (XYZ[0] - XYZ[1]);
-  var b = 200 * (XYZ[1] - XYZ[2]);
+  for (var i = 0; i < 3; i++)
+      cieXYZ[i] = Math.round(10000 * cieXYZ[i]) / 10000;
 
-  Lab[0] = Math.round(10000 * L) / 10000;
-  Lab[1] = Math.round(10000 * a) / 10000;
-  Lab[2] = Math.round(10000 * b) / 10000;
-  //console.log(Lab[0] + " " + Lab[1] + " " + Lab[2]);
-  //console.log(Lab);
-  return Lab;
+  // account for standard illuminant of sRGB
+  // Observer: 2°, Illuminant: D65
+  cieXYZ[0] /= 95.047;
+  cieXYZ[1] /= 100.0;
+  cieXYZ[2] /= 108.883;
+
+  // convert to CIEL*a*b* 1976 [L, a, b]
+  for (var i = 0; i < 3; i++)
+    if (cieXYZ[i] > .008856)
+      cieXYZ[i] = Math.pow(cieXYZ[i], 1/3);
+    else
+      cieXYZ[i] = 7.787 * cieXYZ[i] + 16/116;
+
+  var cieLab = [0, 0, 0];
+  cieLab[0] = 116 * cieXYZ[1] - 16;
+  cieLab[1] = 500 * (cieXYZ[0] - cieXYZ[1]);
+  cieLab[2] = 200 * (cieXYZ[1] - cieXYZ[2]);
+
+  for (var i = 0; i < 3; i++)
+      cieLab[i] = Math.round(10000 * cieLab[i]) / 10000;
+
+  return cieLab;
 }
 
 /**
