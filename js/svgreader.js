@@ -391,13 +391,24 @@ function convert(index) {
   }
 }
 //document.getElementById("convert-btn").onclick = convert;
-//
-function hexToNumber(hex) { //Takes in a string of length two and converts to 0-255
+
+
+/**
+ * Inteprets a hex value of length 2 as an integer value
+ * @param {string}
+ * @returns {number}
+ */
+function hexToNumber(hex) {
   hex = hex.toUpperCase();
-  return (16 * sixteenBitToDec(hex.charAt(0))) + (sixteenBitToDec(hex.charAt(1)));
+  return 16 * sixteenBitToDec(hex.charAt(0)) + sixteenBitToDec(hex.charAt(1));
 }
-//
-//
+
+
+/**
+ * Parses a character into it's hexidecimal value
+ * @param {string}
+ * @returns {number}
+ */
 function sixteenBitToDec(bit) {
   switch (bit) {
     case 'A':
@@ -417,10 +428,17 @@ function sixteenBitToDec(bit) {
   }
 }
 
-function jet_to_val(r, g, b) {
-  /* convert a jet pixel into it's value
-  http://blogs.mathworks.com/cleve/2015/02/02/origins-of-colormaps/
-  */
+
+/**
+ * Convert a jet pixel into it's value
+ * http://blogs.mathworks.com/cleve/2015/02/02/origins-of-colormaps/
+ * @param {number[]}
+ * @returns {number}
+ */
+function approxJetToValue(sRGB) {
+  var r = sRGB[0];
+  var g = sRGB[1];
+  var b = sRGB[2];
 
   if (g == 0 && r == 0) {
     return b / 4 - 1 / 8;
