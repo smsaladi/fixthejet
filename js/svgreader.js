@@ -26,18 +26,7 @@ function convert(index) {
     var viridisColor;
     var currentDistance;
     for (var i = 0; i < imageData.data.length; i += 4) {
-      var pxl = new Array(3);
-      // imageData.data[i] = imageData.data[i+1];
-      // imageData.data[i+1] = imageData.data[i+2];
-      // imageData.data[i+2] = place;
-
-      pxl[0] = imageData.data[i];
-      pxl[1] = imageData.data[i + 1];
-      pxl[2] = imageData.data[i + 2];
-
-      //console.log(pxl);
-      //Convert pxl to lab color
-      var lab = sRGBToLab(pxl);
+      var lab = sRGBToLab(imageData.data.slice(i, i + 3));
       var j = 0;
       var lowestDistance = euclideanDist(lab, lab_array[0]);
       for (var k = 0; k < 256; k++) {
