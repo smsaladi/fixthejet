@@ -238,7 +238,7 @@ function convert(index) {
     var height = object.height;
     var imageData = ctx.getImageData(0, 0, width, height);
     var img = new Array(width);
-    var lab_array = createLabJetArray();
+    var lab_array = createJetInLabSpace();
     var lastIndex = 0;
     console.log(width);
     //var j = 0;
@@ -436,49 +436,47 @@ function jet_to_val(r, g, b) {
     return -g / 4 + 7 / 8;
   } else if (g == 0 && b == 0) {
     return -r / 4 + 9 / 8;
-  } else if (r == 0 && g == 0 && b == 0) {
-    return 3;
-  } else if (r == 1 && g == 1 && b == 1) {
-    return 2;
-  } else {
-    return 4;
   }
 }
 
-function createLabJetArray() {
-  var lab_array = new Array(256);
-  var n = 0;
-  for (var i = 0; i < 1; i += 1 / 256) {
-    var r;
-    var g;
-    var b;
-    if (i < .125) {
-      r = 0;
-      g = 0;
-      b = .5 + (4 * i);
-    } else if (i < 0.375) {
-      r = 0;
-      g = -.5 + (4 * i);
-      b = 1;
-    } else if (i < 0.625) {
-      r = (-1.5) + (4 * i);
-      g = 1;
-      b = 2.5 - (4 * i);
-    } else if (i < 0.875) {
-      r = 1;
-      g = 3.5 - (4 * i);
-      b = 0;
+
+/**
+ * Create an array of Jet values in the Lab colorspace
+ *
+ * @param {number} [bitDepth]
+ * @returns {number[number[]]}
+ */
+function createJetInLabSpace(bitDepth = 8) {
+  var jetInLab = new Array(Math.pow(2, bitDepth));
+
+  for (var i = 0; i < jetInLab.length; i++) {
+    var rgbJet = [0, 0, 0];
+    var iFrac = i / jetInLab.length;
+
+    // find the fractional R, G, B colors for each Jet value
+    if (iFrac < .125) {
+      rgbJet[2] = 0.5 + 4 * iFrac;
+    } else if (iFrac < 0.375) {
+      rgbJet[1] = -0.5 + 4 * iFrac;
+      rgbJet[2] = 1;
+    } else if (iFrac < 0.625) {
+      rgbJet[0] = -1.5 + 4 * iFrac;
+      rgbJet[1] = 1;
+      rgbJet[2] = 2.5 - 4 * iFrac;
+    } else if (iFrac < 0.875) {
+      rgbJet[0] = 1;
+      rgbJet[1] = 3.5 - 4 * iFrac;
     } else {
-      r = 4.5 - (4 * i);
-      g = 0;
-      b = 0;
+      rgbJet[0] = 4.5 - 4 * iFrac;
     }
-    var lab = sRGBToLab([Math.round(255 * r), Math.round(g * 255), Math.round(b * 255)]);
-    //console.log(lab);
-    lab_array[n] = lab;
-    n++;
+
+    // Convert fractional values into ints of the given bitDepth
+    for (var j = 0; j < 3; j++)
+      rgbJet[j] = Math.round(rgbJet[j] * (jetInLab.length - 1));
+
+    jetInLab[i] = sRGBToLab(rgbJet);
   }
-  return lab_array;
+  return jetInLab;
 }
 
 
