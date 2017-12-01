@@ -9,10 +9,8 @@
 var colormapChromaJS = chroma.scale(viridis);
 
 
-
-function convert(index) {
-  var object = document.getElementById("uploaded" + index);
-  var name = (object.nodeName).toUpperCase();
+function convertFigure(element) {
+  var object = element;
 
   var unmappedColors = false;
 
@@ -24,7 +22,7 @@ function convert(index) {
                     chroma([255, 255, 255]).lab()]   // white
 
 
-  if (name == "CANVAS") {
+  if (object.class == "raster-figure") {
     // get image from page
     var ctx = object.getContext('2d');
     var imageData = ctx.getImageData(0, 0, object.width, object.height);
@@ -45,7 +43,7 @@ function convert(index) {
     }
     ctx.putImageData(imageData, 0, 0);
 
-  } else if (name == "SVG") {
+  } else if (object.class == "vector-figure") {
     var elements = object.getElementsByTagName('*');
     for (var i = 0; i < elements.length; i++) {
       var jetColor = elements[i].getAttribute('fill');
