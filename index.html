@@ -34,6 +34,9 @@
       <h6 class="lead">Seamless web application for converting from Jet to Viridis</h6>
     </div>
 
+  <div id="alert-section">
+  </div>
+
   <div class="upload-drop-zone" id="drop-zone">
     <label id="to-click" for="files" class="input-label">
       Drag and Drop Files Here or Click to Browse
@@ -44,23 +47,24 @@
   <br>
 
   <div id="figure-list">
-    <!-- Images are loaded here -->
-    <!-- Section template -->
-    <script  type="text/x-tmpl" id="section-template">
-      <div class="section">
-        <!-- place image here -->
-        <div class="button-container">
-          <button id="convert-btn" class="btn btn-success" onClick="convertFigure(this);">
-            <span>Convert </span><i class="glyphicon glyphicon-flash"></i>
-          </button>
-          <button id="download-btn" class="btn btn-info" onClick="downloadFigure(this);">
-            <span>Download </span><i class="glyphicon glyphicon-download"></i>
-          </button>
-          <button id="delete-btn" class="btn btn-danger delete" onClick="deleteSection(this);">
-            <span>Delete </span><i class="glyphicon glyphicon-remove"></i>
-          </button>
-        </div>
-      </div>
+    <!-- Figure section template -->
+    <script type="text/x-tmpl" id="section-template" class="figure-section">
+          <div class=col> <div class=row>
+          <div class="figure-container">
+
+          </div>
+          </div> </div>
+          <div class="button-container">
+            <button id="convert-btn" class="btn btn-success" onClick="convertFigure(this);">
+              <span>Convert </span><i class="glyphicon glyphicon-flash"></i>
+            </button>
+            <button id="download-btn" class="btn btn-info" onClick="downloadFigure(this);">
+              <span>Download </span><i class="glyphicon glyphicon-download"></i>
+            </button>
+            <button id="delete-btn" class="btn btn-danger delete" onClick="deleteSection(this);">
+              <span>Delete </span><i class="glyphicon glyphicon-remove"></i>
+            </button>
+          </div>
     </script>
   </div>
 
@@ -112,12 +116,12 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.3.4/chroma.min.js" integrity="sha256-sTTE1lDQFmk1nQ4uuhafJjR3/t8vwQPmxorZes3v3G0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.5.1/snap.svg-min.js" integrity="sha256-oI+elz+sIm+jpn8F/qEspKoKveTc5uKeFHNNVexe6d8=" crossorigin="anonymous"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-JavaScript-Templates/3.11.0/js/tmpl.min.js" integrity="sha256-XboZShAO7unfXE97NnKTadU7ISs3RtjNGlCGccyRxuA=" crossorigin="anonymous"></script>
-
-<script src="js/guimethods.js"></script>
 <script src="js/colorscales.js"></script>
 <script src="js/svgreader.js"></script>
+<script src="js/guimethods.js"></script>
+
 
 <script>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
