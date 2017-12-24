@@ -3,6 +3,32 @@
  *
  */
 
+//**********CHECK BROWSER SUPPORT********************
+if (!document.createElement("canvas").getContext) {
+  var alert = document.createElement("div");
+  alert.className = "alert alert-warning";
+  alert.innerText = "Canvas doesn't seem to be working in your browser. No guarantee raster images will be processed properly. Please try another browser or proceed with caution.";
+  document.getElementById("alert-section").appendChild(alert);
+}
+if (typeof SVGRect == "undefined") {
+  var alert = document.createElement("div");
+  alert.className = "alert alert-warning";
+  alert.innerText = "SVG images don't seem to be working in your browser. No guarantee vector images will be processed properly. Please try another browser or proceed with caution.";
+  document.getElementById("alert-section").appendChild(alert);
+}
+
+
+//*****PARSE HTML TEMPLATE FOR EACH FIGURE SECTION*******
+function parseTemplate() {
+  orig = document.getElementById('section-template');
+  newdoc = document.createElement('div');
+  newdoc.classList = orig.classList //'figure-section';
+  newdoc.innerHTML = orig.innerText;
+  orig.remove();
+  return newdoc;
+}
+sectionTemplate = parseTemplate();
+
 
 //**********FILE INPUT METHODS***********************
 function handleFileSelect(evt, files) {
@@ -12,58 +38,55 @@ function handleFileSelect(evt, files) {
       prepareSVG(files[i]);
     else if (files[i].type.match('image/png'))
       preparePNG(files[i]);
+    else
+      console.log("File not recognized. Type: " + files[i].type)
 }
 
 function preparePNG(file) {
     var reader = new FileReader();
-
-    // Closure to capture the file information.
-    reader.onload = (function(f) {
-      return function(e) {
-        var data = e.target.result;
-
-        var obj = document.createElement('div');
-        obj.setAttribute('id', 'image-container');
-          var canvas = document.createElement("canvas");
-          obj.appendChild(canvas);
-          context = canvas.getContext('2d');
-
-          var image = new Image();
-          image.src = data;
-          image.onload = function() {
-            canvas.width = image.width;
-            canvas.height = image.height;
-            context.drawImage(image, 0, 0);
-          }
-          createFigureSection();
+    reader.fileName = file.name;
+    reader.onload = function(evt) {
+        var canvas = document.createElement("canvas");
+        var image = new Image();
+        image.src = evt.target.result;
+        image.onload = function() {
+          canvas.width = image.width;
+          canvas.height = image.height;
+          canvas.getContext('2d').drawImage(image, 0, 0);
+        }
+        createFigureSection(canvas, evt.target.fileName, "png");
       };
-    })(file);
-
   // Read in the image file as a data URL.
   reader.readAsDataURL(file);
 }
 
 function prepareSVG(file) {
   var reader = new FileReader();
-  // Closure to capture the file information.
-  reader.onload = (function(f) {
-    return function(e) {
-      var data = e.target.result;
-      var obj = document.createElement('div');
-      obj.setAttribute('id', 'image-container');
-      obj.innerHTML = [data].join('');
-      createFigureSection();
-    };
-  })(file);
+  reader.fileName = file.name;
+  reader.onload = function(evt) {
+      createFigureSection(evt.target.result, evt.target.fileName, "svg");
+  };
   reader.readAsText(file);
 }
 
-function createFigureSection(data) {
-  var newDiv = tmpl("section-template", data);
-  document.getElementById('figure-list').appendChild(div);
+function createFigureSection(data, sectid, cls) {
+  var figSection = sectionTemplate.cloneNode(true);
+  figSection.id = sectid;
+  figSection.classList.add(cls);
+  try {
+    figSection.getElementsByClassName("figure-container")[0].appendChild(data);
+  } catch(err) {
+    figSection.getElementsByClassName("figure-container")[0].innerHTML = data;
+  }
+  document.getElementById('figure-list').appendChild(figSection);
+  return figSection;
 }
 
-//************Dropzone METHODS***********************
+function deleteSection(element) {
+  element.parentNode.parentNode.remove();
+}
+
+//************DROPZONE METHODS***********************
 var dropZone = document.getElementById('drop-zone');
 
 document.getElementById('files').addEventListener('change', function(evt) {
@@ -101,69 +124,52 @@ dropZone.onclick = function() {
   var uploadFiles = document.getElementById('drop-zone').files;
 };
 
-
-function deleteSection(index) {
-  var list = document.getElementById("image-list");
-  var child = document.getElementById("worker" + index);
-  list.removeChild(child);
+//************DOWNLOAD METHODS***********************
+function splitFilename(fn) {
+  var parts = fn.split(".");
+  var ext = parts.pop(-1);
+  var name = parts.join(".");
+  return [name, ext];
 }
 
-
-//************DOWNLOAD METHODS***********************
 function downloadFigure(element) {
-  var data = "";
+  // Get current figure section and figure out download file name
+  var figSection = element.parentNode.parentNode;
+  var [name, ext] = splitFilename(figSection.id);
+  var dlName = name + "_converted." + ext;
+  console.log(dlName)
+
+  var fig = figSection.getElementsByClassName('figure-container')[0];
+
+  // Setup download url and file
   var url = "";
   var file = null;
-  if (type == "image/svg+xml") {
-    data = element.innerHTML;
-
-    file = new Blob([data], {
-      type: type
-    });
+  if (figSection.classList.contains("svg")) {
+    file = new Blob([fig.innerHTML], { type: "image/svg+xml" });
     url = URL.createObjectURL(file);
-    filename = "converted.png";
-  } else if (type == "image/png") {
-    var canvas = element.childNodes[0];
+  } else if (figSection.classList.contains("png")) {
+    var canvas = fig.getElementsByTagName("canvas")[0];
     url = canvas.toDataURL();
-    file = new Blob([url], {
-      type: type
-    });
-  }
+    file = new Blob([url], { type: "image/png" });
+  } else
+    alert("We've run into an error.")
 
+  console.log(url, file);
+
+  // Launch the download
   if (window.navigator.msSaveOrOpenBlob)
-    // IE10+
-    window.navigator.msSaveOrOpenBlob(file, filename);
+    // IE10+ only
+    window.navigator.msSaveOrOpenBlob(file, dlName);
   else {
-    // Others
     var a = document.createElement("a");
     a.href = url;
-    a.download = "converted";
+    a.download = dlName;
     document.body.appendChild(a);
     a.click();
+    // Remove url immediately after "clicking"
     setTimeout(function() {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     }, 0);
   }
-}
-
-
-function getType(element) {
-  var c = element.childNodes;
-  var name = "";
-  if (c.length != 0)
-    for (var i = 0; i < c.length; i++) {
-      if ((c[i].nodeName).includes("#"))
-        continue;
-      name = c[i].nodeName;
-      break;
-    }
-  name = name.toUpperCase();
-
-  if (name == "CANVAS")
-    return "image/png";
-  else if (name == "SVG")
-    return "image/svg+xml";
-  else
-    return NULL;
 }
