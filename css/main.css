@@ -24,15 +24,19 @@
   height: 220px;
 }
 
-.worker {
-  padding-left: 6px;
-  padding-bottom: 6px;
-  margin-top: 10px;
+.figure-section {
+  padding: 6px;
+  margin: 10px;
   height: auto;
   background-color: #c0c0c0;
   border-radius: 5px;
   min-height: 100px;
   overflow: hidden;
+}
+
+.figure-container {
+    position: relative;
+    top: 0;
 }
 
 .imgs {

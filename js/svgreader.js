@@ -8,9 +8,13 @@
 
 var colormapChromaJS = chroma.scale(viridis);
 
+function convertColor() {
+
+}
 
 function convertFigure(element) {
-  var object = element;
+  var figSection = element.parentNode.parentNode;
+  var fig = figSection.getElementsByClassName('figure-container')[0];
 
   var unmappedColors = false;
 
@@ -21,71 +25,93 @@ function convertFigure(element) {
   var outOfScope = [chroma([0, 0, 0]).lab(),         // black
                     chroma([255, 255, 255]).lab()]   // white
 
-
-  if (object.class == "raster-figure") {
+  if (figSection.classList.contains("png")) {
     // get image from page
-    var ctx = object.getContext('2d');
-    var imageData = ctx.getImageData(0, 0, object.width, object.height);
+    var canvas = fig.getElementsByTagName("canvas")[0];
+    var ctx = canvas.getContext('2d');
+    var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
+    function new_cm(frac) {
+      return colormapChromaJS(frac).rgb();
+    }
+
+    var pxl = "";
     // find closest viridis color for each jet pixel
     // i += 4 since each pixel is [R, G, B, alpha]
-    for (var i = 0; i < imageData.data.length; i += 4) {
-      var pxlRGB = Array.from(imageData.data.slice(i, i + 3));
-      var mappedValue = invertValue(chroma(pxlRGB).lab(), jetInLabSpace, outOfScope);
-      if (mappedValue == null)
-        unmappedColors = true;
-      else {
-        var newRGBColor = colormapChromaJS(mappedValue).rgb();
-        imageData.data[i] = newRGBColor[0];
-        imageData.data[i + 1] = newRGBColor[1];
-        imageData.data[i + 2] = newRGBColor[2];
-      }
-    }
+    for (var i = 0; i < imageData.data.length; i += 4)
+      [[imageData.data[i],
+       imageData.data[i + 1],
+       imageData.data[i + 2]], unmappedColors] =
+        invertColor(Array.from(imageData.data.slice(i, i + 3)),
+                    jetInLabSpace, outOfScope, new_cm);
     ctx.putImageData(imageData, 0, 0);
 
-  } else if (object.class == "vector-figure") {
-    var elements = object.getElementsByTagName('*');
-    for (var i = 0; i < elements.length; i++) {
-      var jetColor = elements[i].getAttribute('fill');
+  } else if (figSection.classList.contains("svg")) {
+    function new_cm(frac) {
+      return colormapChromaJS(frac).hex();
+    }
 
-      // check if a fill attribute exists
-      if (jetColor != null)
-        jetColor = chroma(jetColor)
-      // otherwise check if the style.fill exists
-      else if (elements[i].style.fill != "") {
-        var str = elements[i].style.fill;
-        jetColor = str.substring(4, str.length - 1).replace(/ /g, '').split(',');
-        jetColor = chroma(jetColor);
-      } else
-        continue;
+    var elems = fig.firstElementChild.getElementsByTagName('*');
+    var mappedValue = "";
+    for (var i = 0; i < elems.length; i++) {
+      // various locations for color-type attributes
+      if (elems[i].getAttribute('fill') != null) {
+        [mappedValue, unmappedColors] =
+          invertColor(elems[i].getAttribute('fill'), jetInLabSpace, outOfScope, new_cm);
+        elems[i].setAttribute('fill', mappedValue);
+      } else if (elems[i].style.fill != "" && elems[i].style.fill != "none")
+        [elems[i].style.fill, unmappedColors] =
+          invertColor(elems[i].style.fill, jetInLabSpace, outOfScope, new_cm);
+      else if (elems[i].style.fill != "" && elems[i].style.fill != "none")
+        [elems[i].style.stroke, unmappedColors] =
+          invertColor(elems[i].style.stroke, jetInLabSpace, outOfScope, new_cm);
+      // gradient element
+      else if (false)
+        true
+      // image within svg ("rasterized object")
+      else if (false) {
+        var canvas = document.getElementById("c");
+var ctx = canvas.getContext("2d");
 
-      var mappedValue = invertValue(jetColor.lab(), jetInLabSpace, outOfScope);
-
-      if (mappedValue == null)
-        unmappedColors = true;
-      else {
-        var newRGBColor = colormapChromaJS(mappedValue).hex();
-
-        if (elements[i].getAttribute('fill') != null)
-          elements[i].setAttribute('fill', newRGBColor);
-        else if (elements[i].style.fill != "")
-          elements[i].style.fill = newRGBColor;
+// var image = new Image();
+// image.onload = function() {
+//     ctx.drawImage(image, 0, 0);
+// };
+// image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9oMCRUiMrIBQVkAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAADElEQVQI12NgoC4AAABQAAEiE+h1AAAAAElFTkSuQmCC";
       }
     }
   }
 
-  if (unmappedColors)
-    alert("Your image contains some path elements not in the jet colormap." +
-          " We have left these alone and converted the rest of the image");
+  if (unmappedColors) {
+    var alert = document.createElement("div");
+    alert.className = "alert alert-warning";
+    alert.innerText = "Your image contains some colors (e.g. white, black) not in the jet colormap. We have left these alone and converted the rest of the image.";
+    figSection.insertBefore(alert, figSection.firstElementChild);
+  }
 }
-
 
 /**
  * Finds the value that gives rise to the given color within the mapping
- * @param {number[]}
- * @param {number[][]}
- * @param {number[][]}
- * @returns {number}
+ * @param {number[]} value: color in RGB space
+ * @param {number[][]} mapping: original colormap to match to (in lab space)
+ * @param {number[][]} outOfScope: colors to ignore
+ * @param {function} cm: callable that accepts a fractional value
+ * @returns {number} outcome of callable
+ */
+function invertColor(value, mapping, outOfScope, cm) {
+    var mappedValue = invertValue(chroma(value).lab(), mapping, outOfScope);
+    if (mappedValue == null)
+      return [value, true];
+    else
+      return [cm(mappedValue), false];
+}
+
+/**
+ * Finds the value that gives rise to the given color within the mapping
+ * @param {number[]} value: outcome of original space
+ * @param {number[][]} mapping: original space to match to
+ * @param {number[][]} outOfScope: values to ignore
+ * @returns {number} mapped value (fractional)
  */
 function invertValue(value, mapping, outOfScope) {
   var lowestIndex = 0;
