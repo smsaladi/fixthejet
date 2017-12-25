@@ -36,13 +36,13 @@ function handleFileSelect(evt, files) {
   for (var i = 0; i < files.length; i++)
     if (files[i].type.match('image/svg'))
       prepareSVG(files[i]);
-    else if (files[i].type.match('image/png'))
-      preparePNG(files[i]);
+    else if (files[i].type.match('image/png') || files[i].type.match('image/jpeg'))
+      prepareCanvas(files[i]);
     else
       console.log("File not recognized. Type: " + files[i].type)
 }
 
-function preparePNG(file) {
+function prepareCanvas(file) {
     var reader = new FileReader();
     reader.fileName = file.name;
     reader.onload = function(evt) {
@@ -54,7 +54,7 @@ function preparePNG(file) {
           canvas.height = image.height;
           canvas.getContext('2d').drawImage(image, 0, 0);
         }
-        createFigureSection(canvas, evt.target.fileName, "png");
+        createFigureSection(canvas, evt.target.fileName, "canvas");
       };
   // Read in the image file as a data URL.
   reader.readAsDataURL(file);
@@ -147,7 +147,7 @@ function downloadFigure(element) {
   if (figSection.classList.contains("svg")) {
     file = new Blob([fig.innerHTML], { type: "image/svg+xml" });
     url = URL.createObjectURL(file);
-  } else if (figSection.classList.contains("png")) {
+  } else if (figSection.classList.contains("canvas")) {
     var canvas = fig.getElementsByTagName("canvas")[0];
     url = canvas.toDataURL();
     file = new Blob([url], { type: "image/png" });
