@@ -38,7 +38,7 @@ function convertFigure(element) {
     for (var i = 0; i < elems.length; i++) {
       // various locations for color-type attributes
       if (elems[i].getAttribute('fill') != null)
-        [elems[i].attributes.fill, unmappedColors] =
+        [elems[i].attributes.fill.value, unmappedColors] =
           invertColor(elems[i].getAttribute('fill'), jetInLabSpace, outOfScope, toNewCm);
       else if (elems[i].style.fill != "" && elems[i].style.fill != "none")
         [elems[i].style.fill, unmappedColors] =
