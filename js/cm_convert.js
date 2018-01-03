@@ -24,7 +24,11 @@ function convertFigure(figSection) {
   var toMapName = getSelection(figSection, 'to-colormap');
   var toCm = chroma.scale(colorscales[toMapName]);
 
-  var jetInLabSpace = createJetInLabSpace();
+  if (fromMapName == 'jet') {
+    var fromCm = createJetInLabSpace();
+  } else {
+    var fromCm = convertHexToLab(colorscales[fromMapName]);
+  }
 
   // check that the pixel doesn't correspond more closely to black or white
   // presumably text on the page
@@ -33,7 +37,7 @@ function convertFigure(figSection) {
 
   if (figSection.classList.contains("canvas")) {
     unmappedColors = convertCanvas(fig.getElementsByTagName("canvas")[0],
-                                   jetInLabSpace, outOfScope, unmappedColors, toCm);
+                                   fromCm, outOfScope, unmappedColors, toCm);
   }
   else if (figSection.classList.contains("svg")) {
     var toNewCm = function (frac, cmap=toCm) {
@@ -45,13 +49,13 @@ function convertFigure(figSection) {
       // various locations for color-type attributes
       if (elems[i].getAttribute('fill') != null)
         [elems[i].attributes.fill.value, unmappedColors] =
-          invertColor(elems[i].getAttribute('fill'), jetInLabSpace, outOfScope, toNewCm, unmappedColors);
+          invertColor(elems[i].getAttribute('fill'), fromCm, outOfScope, toNewCm, unmappedColors);
       else if (elems[i].style.fill != "" && elems[i].style.fill != "none")
         [elems[i].style.fill, unmappedColors] =
-          invertColor(elems[i].style.fill, jetInLabSpace, outOfScope, toNewCm, unmappedColors);
+          invertColor(elems[i].style.fill, fromCm, outOfScope, toNewCm, unmappedColors);
       else if (elems[i].style.fill != "" && elems[i].style.fill != "none")
         [elems[i].style.stroke, unmappedColors] =
-          invertColor(elems[i].style.stroke, jetInLabSpace, outOfScope, toNewCm, unmappedColors);
+          invertColor(elems[i].style.stroke, fromCm, outOfScope, toNewCm, unmappedColors);
       // TODO: other elements?
       // gradients?
     }
@@ -70,7 +74,7 @@ function convertFigure(figSection) {
           canvas.height = evt.target.height;
           ctx.drawImage(evt.target, 0, 0);
 
-          var unmappedColors = convertCanvas(canvas, jetInLabSpace, outOfScope, unmappedColors, toCm);
+          var unmappedColors = convertCanvas(canvas, fromCm, outOfScope, unmappedColors, toCm);
 
           img.setAttribute("xlink:href", canvas.toDataURL());
       };
@@ -192,6 +196,14 @@ function createJetInLabSpace(bitDepth = 8) {
     jetInLab[i] = chroma(rgbJet).lab();
   }
   return jetInLab;
+}
+
+function convertHexToLab(arr) {
+  var labArr = new Array(arr.length);
+  for (var i = 0; i < arr.length; i++) {
+    labArr[i] = chroma(arr[i]).lab();
+  }
+  return labArr;
 }
 
 
