@@ -32,7 +32,7 @@
   <div class="container">
     <div class="starter-template">
       <h1>fixthejet: An online colormap converter</h1>
-      <h6 class="lead">Seamless web application for converting from Jet to Viridis</h6>
+      <h6 class="lead">Convert your figures to a better colormap!</h6>
     </div>
 
   <div id="alert-section">
@@ -99,16 +99,18 @@
 
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h3 class="panel-title">Notes more</h3>
+      <h3 class="panel-title">Notes</h3>
     </div>
     <div class="panel-body">
       <ul>
+        <li>
+          svg, jpg, and png files are currently supported. It is unlikely that we will support others at least in the near future. Please use a desktop application (e.g. <a href="https://inkscape.org/en">Inkscape</a>, <a href="https://www.adobe.com/products/illustrator.html">Adobe Illustrator></a>) or a web service  to convert your figure into one of these formats.
+        </li>
         <li>
           All calculations are done client-side, i.e. files are <i>not</i> uploaded to our servers or anywhere else.
           As a side effect, if you have having trouble, please try updating your broswer or using a different one.
           We develop and test on <a href="https://www.google.com/chrome/">Google Chrome</a>.
         </li>
-        <li>Other jet info....</li>
         <li>Help us improve with a pull request! All code is available under an MIT License at <a href="https://github.com/smsaladi/fixthejet">Github</a>.
         </li>
         <li>Meet the authors: Alex Guerra and <a href="http://shyam.saladi.org">Shyam Saladi</a>.
@@ -123,9 +125,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js" integrity="sha256-19J3rT3tQdidgtqqdQ3xNu++Gd7EoP/ag/0x1lHi0xY=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.3.4/chroma.min.js" integrity="sha256-sTTE1lDQFmk1nQ4uuhafJjR3/t8vwQPmxorZes3v3G0=" crossorigin="anonymous"></script>
 
-<script src="js/colorscales.js?1510"></script>
-<script src="js/cm_convert.js?1510"></script>
-<script src="js/guimethods.js?1502"></script>
+<script src="js/colorscales.js"></script>
+<script src="js/cm_convert.js"></script>
+<script src="js/guimethods.js"></script>
 
 
 <script>
