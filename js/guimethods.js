@@ -39,7 +39,7 @@ function handleFileSelect(evt, files) {
     else if (files[i].type.match('image/png') || files[i].type.match('image/jpeg'))
       prepareCanvas(files[i]);
     else
-      console.log("File not recognized. Type: " + files[i].type)
+      alert("Sorry, we probably don't support that filetype (" + files[i].type + ")")
 }
 
 function prepareCanvas(file) {
