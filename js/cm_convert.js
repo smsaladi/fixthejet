@@ -6,8 +6,8 @@
  * https://github.com/gka/chroma.js
  */
 
-function getSelection(selObj) {
-  return selObj.options[selObj.selectedIndex].innerText;
+function getSelection(element, selName) {
+  return element.getElementsByClassName(selName)[0].getElementsByClassName('filter-option')[0].innerText;
 }
 
 
@@ -20,8 +20,8 @@ function convertFigure(figSection) {
   var fig = figSection.getElementsByClassName('figure-container')[0];
   var unmappedColors = false;
 
-  var fromMapName = getSelection(figSection.getElementsByClassName('from-colormap')[0]);
-  var toMapName = getSelection(figSection.getElementsByClassName('to-colormap')[0]);
+  var fromMapName = getSelection(figSection, 'from-colormap');
+  var toMapName = getSelection(figSection, 'to-colormap');
   var toCm = chroma.scale(colorscales[toMapName]);
 
   var jetInLabSpace = createJetInLabSpace();
