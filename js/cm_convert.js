@@ -6,18 +6,23 @@
  * https://github.com/gka/chroma.js
  */
 
-var colormapChromaJS = chroma.scale(viridis);
+function getSelection(selObj) {
+  return selObj.options[selObj.selectedIndex].innerText;
+}
+
 
 /**
  * Main conversion handler responds to "convert button"
  * @param {element} value: the current button that was clicked
  * @returns none
  */
-function convertFigure(element) {
-  var figSection = element.parentNode.parentNode;
+function convertFigure(figSection) {
   var fig = figSection.getElementsByClassName('figure-container')[0];
-
   var unmappedColors = false;
+
+  var fromMapName = getSelection(figSection.getElementsByClassName('from-colormap')[0]);
+  var toMapName = getSelection(figSection.getElementsByClassName('to-colormap')[0]);
+  var toCm = chroma.scale(colorscales[toMapName]);
 
   var jetInLabSpace = createJetInLabSpace();
 
@@ -26,26 +31,27 @@ function convertFigure(element) {
   var outOfScope = [chroma([0, 0, 0]).lab(),         // black
                     chroma([255, 255, 255]).lab()];   // white
 
-  if (figSection.classList.contains("canvas"))
+  if (figSection.classList.contains("canvas")) {
     unmappedColors = convertCanvas(fig.getElementsByTagName("canvas")[0],
-                  jetInLabSpace, outOfScope, unmappedColors);
+                                   jetInLabSpace, outOfScope, unmappedColors, toCm);
+  }
   else if (figSection.classList.contains("svg")) {
-    function toNewCm(frac) {
-      return colormapChromaJS(frac).hex();
-    }
+    var toNewCm = function (frac, cmap=toCm) {
+      return cmap(frac).hex();
+    };
 
     var elems = fig.firstElementChild.getElementsByTagName('*');
     for (var i = 0; i < elems.length; i++) {
       // various locations for color-type attributes
       if (elems[i].getAttribute('fill') != null)
         [elems[i].attributes.fill.value, unmappedColors] =
-          invertColor(elems[i].getAttribute('fill'), jetInLabSpace, outOfScope, toNewCm);
+          invertColor(elems[i].getAttribute('fill'), jetInLabSpace, outOfScope, toNewCm, unmappedColors);
       else if (elems[i].style.fill != "" && elems[i].style.fill != "none")
         [elems[i].style.fill, unmappedColors] =
-          invertColor(elems[i].style.fill, jetInLabSpace, outOfScope, toNewCm);
+          invertColor(elems[i].style.fill, jetInLabSpace, outOfScope, toNewCm, unmappedColors);
       else if (elems[i].style.fill != "" && elems[i].style.fill != "none")
         [elems[i].style.stroke, unmappedColors] =
-          invertColor(elems[i].style.stroke, jetInLabSpace, outOfScope, toNewCm);
+          invertColor(elems[i].style.stroke, jetInLabSpace, outOfScope, toNewCm, unmappedColors);
       // TODO: other elements?
       // gradients?
     }
@@ -64,7 +70,8 @@ function convertFigure(element) {
           canvas.height = evt.target.height;
           ctx.drawImage(evt.target, 0, 0);
 
-          convertCanvas(canvas, jetInLabSpace, outOfScope, unmappedColors);
+          var unmappedColors = convertCanvas(canvas, jetInLabSpace, outOfScope, unmappedColors, toCm);
+
           img.setAttribute("xlink:href", canvas.toDataURL());
       };
       image.src = img.getAttribute("xlink:href");
@@ -86,14 +93,12 @@ function convertFigure(element) {
  * @param {number[][]} outOfScope: colors to ignore
  * @returns whether there were unmapped colors
  */
-function convertCanvas(cvs, jetInLabSpace, outOfScope) {
+function convertCanvas(cvs, jetInLabSpace, outOfScope, unmappedColors, toCm) {
   var ctx = cvs.getContext('2d');
   var imageData = ctx.getImageData(0, 0, cvs.width, cvs.height);
-  var unmappedColors = false;
-
-  function toNewCm(frac) {
-    return colormapChromaJS(frac).rgb();
-  }
+  var toNewCm = function (frac, cmap=toCm) {
+    return cmap(frac).rgb();
+  };
 
   // find closest viridis color for each jet pixel
   // i += 4 since each pixel is [R, G, B, alpha]
@@ -102,7 +107,7 @@ function convertCanvas(cvs, jetInLabSpace, outOfScope) {
        imageData.data[i + 1],
        imageData.data[i + 2]], unmappedColors] =
         invertColor(Array.from(imageData.data.slice(i, i + 3)),
-                    jetInLabSpace, outOfScope, toNewCm);
+                    jetInLabSpace, outOfScope, toNewCm, unmappedColors);
   ctx.putImageData(imageData, 0, 0);
 
   return unmappedColors;
@@ -116,14 +121,14 @@ function convertCanvas(cvs, jetInLabSpace, outOfScope) {
  * @param {function} cm: callable that accepts a fractional value
  * @returns {number} outcome of callable
  */
-function invertColor(value, origValues, outOfScope, cm) {
+function invertColor(value, origValues, outOfScope, cm, umapIn) {
   if (value == "none")
     return [value, true];
   var mappedValue = invertValue(chroma(value).lab(), origValues, outOfScope);
   if (mappedValue == null)
     return [value, true];
   else
-    return [cm(mappedValue), false];
+    return [cm(mappedValue), umapIn];
 }
 
 /**

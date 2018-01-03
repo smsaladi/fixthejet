@@ -49,21 +49,41 @@
   <div id="figure-list">
     <!-- Figure section template -->
     <script type="text/x-tmpl" id="section-template" class="figure-section">
-          <div class=col> <div class=row>
-          <div class="figure-container">
+          <div class="row">
+          <div class="col pull-left">
+            <div class="figure-container">
 
+            </div>
           </div>
-          </div> </div>
+          <div class="col pull-right">
+            <div class="button-container">
+              <select class="form-control from-colormap">
+                <option>jet</option>
+                <option>jet (mpl)</option>
+              </select>
+
+              <select class="form-control to-colormap">
+                <option>viridis</option>
+                <option>magma</option>
+                <option>plasma</option>
+                <option>inferno</option>
+                <option>cividis</option>
+              </select>
+            </div>
+          </div>
+          <div class="col pull-right">
           <div class="button-container">
-            <button id="convert-btn" class="btn btn-success" onClick="convertFigure(this);">
+            <button id="convert-btn" class="btn btn-success" onClick="convertFigure(this.parentNode.parentNode.parentNode.parentNode);">
               <span>Convert </span><i class="glyphicon glyphicon-flash"></i>
             </button>
-            <button id="download-btn" class="btn btn-info" onClick="downloadFigure(this);">
+            <button id="download-btn" class="btn btn-info" onClick="downloadFigure(this.parentNode.parentNode.parentNode.parentNode);">
               <span>Download </span><i class="glyphicon glyphicon-download"></i>
             </button>
-            <button id="delete-btn" class="btn btn-danger delete" onClick="deleteSection(this);">
+            <button id="delete-btn" class="btn btn-danger delete" onClick="deleteSection(this.parentNode.parentNode.parentNode.parentNode);">
               <span>Delete </span><i class="glyphicon glyphicon-remove"></i>
             </button>
+          </div>
+          </div>
           </div>
     </script>
   </div>
