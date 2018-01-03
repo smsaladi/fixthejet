@@ -81,6 +81,7 @@ function createFigureSection(data, sectid, cls) {
   }
   figCont.firstElementChild.classList.add("img-responsive");
   document.getElementById('figure-list').appendChild(figSection);
+  $('select').selectpicker();
   return figSection;
 }
 
