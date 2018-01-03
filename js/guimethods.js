@@ -73,17 +73,19 @@ function createFigureSection(data, sectid, cls) {
   var figSection = sectionTemplate.cloneNode(true);
   figSection.id = sectid;
   figSection.classList.add(cls);
+  var figCont = figSection.getElementsByClassName("figure-container")[0];
   try {
-    figSection.getElementsByClassName("figure-container")[0].appendChild(data);
+    figCont.appendChild(data);
   } catch(err) {
-    figSection.getElementsByClassName("figure-container")[0].innerHTML = data;
+    figCont.innerHTML = data;
   }
+  figCont.firstElementChild.classList.add("img-responsive");
   document.getElementById('figure-list').appendChild(figSection);
   return figSection;
 }
 
-function deleteSection(element) {
-  element.parentNode.parentNode.remove();
+function deleteSection(figSection) {
+  figSection.remove();
 }
 
 //************DROPZONE METHODS***********************
@@ -132,12 +134,10 @@ function splitFilename(fn) {
   return [name, ext];
 }
 
-function downloadFigure(element) {
+function downloadFigure(figSection) {
   // Get current figure section and figure out download file name
-  var figSection = element.parentNode.parentNode;
   var [name, ext] = splitFilename(figSection.id);
   var dlName = name + "_converted." + ext;
-  console.log(dlName)
 
   var fig = figSection.getElementsByClassName('figure-container')[0];
 
@@ -153,8 +153,6 @@ function downloadFigure(element) {
     file = new Blob([url], { type: "image/png" });
   } else
     alert("We've run into an error.")
-
-  console.log(url, file);
 
   // Launch the download
   if (window.navigator.msSaveOrOpenBlob)
