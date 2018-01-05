@@ -52,7 +52,7 @@ function prepareCanvas(file) {
         image.onload = function() {
           canvas.width = image.width;
           canvas.height = image.height;
-          canvas.getContext('2d').drawImage(image, 0, 0);
+          canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
         }
         createFigureSection(canvas, evt.target.fileName, "canvas");
       };
@@ -150,8 +150,8 @@ function downloadFigure(figSection) {
     url = URL.createObjectURL(file);
   } else if (figSection.classList.contains("canvas")) {
     var canvas = fig.getElementsByTagName("canvas")[0];
-    url = canvas.toDataURL();
-    file = new Blob([url], { type: "image/png" });
+    url = canvas.toDataURL("image/png", 1);
+    file = new Blob([url]);
   } else
     alert("We've run into an error.")
 
