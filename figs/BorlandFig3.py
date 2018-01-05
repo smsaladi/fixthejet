@@ -1,61 +1,97 @@
+"""Example data and figures to compare colormaps
+
+As in
+    Borland and Taylor, IEEE Computer Graphics and Applications, 2007
+    doi:10.1109/MCG.2007.323435
+
+"""
+
+import argparse
+
 import numpy as np
-import math
-import random
-import matplotlib.pyplot as plt
+
+from bokeh.io import output_file, show, save
+from bokeh.layouts import gridplot
+from bokeh.plotting import figure
 
 
-dim = [1000, 1000]
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("output_file")
+    parser.add_argument("--shape", type=int, nargs=2, default=[1000, 1000])
+    args = parser.parse_args()
 
-# Linear
-linArr = makeLinear(False, 0, 0, dim)  # Middle 2 args dont matter for this
+    output_file(args.output_file)
 
-# Linear with Discontinuity
-linArrJump = makeLinear(True, 685, 30, dim)
+    shape = args.shape
 
-# Gaussian
-gauss = makeGaussian(dim, (dim[0] / 2, dim[1] / 2), dim[0] * 8)
+    # prep figures
+    p_figs = [figure(x_range=(0, 5), y_range=(0, 5)) for i in range(4)]
 
-# Sinusoidal with linear multiplier
-sinuArr = makeSinu(dim)
+    # Linear
+    # Middle 2 args dont matter for this
+    linear = linear_box(shape)
+    plot_arr(p_figs[0], linear)
+
+    # Linear with discontinuity
+    linear_discont = linear_box(shape, 685, 30)
+    plot_arr(p_figs[1], linear_discont)
+
+    # Gaussian
+    gauss = gaussian_box(shape, (shape[0] / 2, shape[1] / 2), shape[0] * 8)
+    plot_arr(p_figs[2], gauss)
+
+    # Sinusoidal with linear multiplier
+    sinusoid = sinusoid_box(shape)
+    plot_arr(p_figs[3], sinusoid)
+
+    grid = gridplot([p_figs[:2], p_figs[2:]], plot_width=200, plot_height=200)
+
+    save(grid)
+    show(grid)
+    return
+
+def plot_arr(fig, data):
+    fig.image(image=[data], x=0, y=0, dw=5, dh=5, palette="Viridis256")
+    fig.xaxis.visible = False
+    fig.yaxis.visible = False
+    return
+
+def sinusoid_box(shape):
+    x, y = np.arange(shape[0]), np.arange(shape[1])
+
+    # slight linear gradient
+    factor = 1 - (y * .5 + shape[0] * .25) / shape[0]
+
+    x_sin = np.sin(40 * x / shape[0])
+    y_cos = np.cos(20 * y / shape[1])
+
+    x_rep = np.repeat([x_sin], shape[1], axis=0)
+    y_rep = np.repeat([y_cos], shape[0], axis=0)
+
+    return (x_rep + y_rep.transpose()) * factor
 
 
-def makeSinu(dim):
-    x_arr = np.linspace(0, dim[0] - 1, dim[0])
-    y_arr = np.linspace(0, dim[1] - 1, dim[1])
-    final = [[0 for x in range(dim[0])] for y in range(dim[1])]
-    for i in enumerate(x_arr):
-        for j in enumerate(y_arr):
-            x = i[1]
-            y = j[1]
-            factor = 1 - (((y * .5) + (dim[0] * .25)) / dim[0])
-            final[i[0]][j[0]] = (math.cos(20 * x / dim[0]) +
-                                 math.sin(40 * y / dim[1])) * factor
-    return np.array(final)
-
-
-def makeLinear(hasDiscontinuity, position, length, dim):
-    if (hasDiscontinuity):
-        x1 = np.linspace(0, position - 1, position)
-        x2 = np.linspace(position + length,
-                         dim[1] + length - 1, dim[1] - position)
+def linear_box(shape, position=None, length=None):
+    """Makes a linear gradient with a discontinuity, if requested
+    """
+    if position is not None and length is not None:
+        x1 = np.arange(position)
+        x2 = np.arange(position + length, shape[1] + length - 1)
         x = np.concatenate((x1, x2))
     else:
-        x = np.linspace(0, dim[0] - 1, dim[0])
-    arr = [None] * dim[1]
-    for i in range(dim[1]):
-        arr[i] = x
-    return np.array(arr)
+        x = np.arange(shape[0])
+
+    return np.repeat([x], shape[1], axis=0)
 
 
-def makeGaussian(shape, mean, sigma):
-    coors = [range(shape[d]) for d in range(len(shape))]
-    k = np.zeros(shape=shape)
-    cartesian_product = [[]]
-    for coor in coors:
-        cartesian_product = [x + [y] for x in cartesian_product for y in coor]
-    for c in cartesian_product:
-        s = 0
-        for cc, m in zip(c, mean):
-            s += (cc - m)**2
-        k[tuple(c)] = math.exp(-s / (2 * sigma))
-    return k
+def gaussian_box(shape, center, sigma):
+    x = np.arange(shape[0])
+    y = np.arange(shape[1])
+    xx, yy = np.meshgrid(x, y)
+    s = (xx - center[0])**2 + (yy - center[1])**2
+    return np.exp(-s / (2 * sigma))
+
+
+if __name__ == '__main__':
+    main()
