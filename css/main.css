@@ -1,42 +1,50 @@
 .upload-drop-zone {
   border-radius: 5px;
   border-width: 2px;
-  margin-bottom: 20px;
-  margin-left: 10px;
-  margin-right: 10px;
-  margin-top: 30px;
   height: 200px;
+  width: 100%;
   color: #c0c0c0;
-  border-style: solid;
+  border-style: dashed;
   border-color: #c0c0c0;
-  line-height: 200px;
-  text-align: center;
-  font-size: 18px;
+  display: table;
+  padding: 5px;
 }
 .upload-drop-zone.drop {
-  color: #b2b2ff;
-  border-color: #b2b2ff;
-  font-size: 20px;
-  margin-bottom: 10px;
-  margin-left: 0px;
-  margin-right: 0px;
-  margin-top: 10px;
   height: 220px;
+  width: 102%;
+  margin-left: -1%;
+  margin-bottom: -20px;
+}
+.drop-text {
+  font-family: verdana;
+  text-align: center;
+  font-size: 20px;
+}
+#to-click {
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+#files {
+  display: none;
 }
 
 .figure-section {
   padding: 6px;
-  margin: 10px;
+  margin-top: 2%;
   height: auto;
   background-color: #c0c0c0;
   border-radius: 5px;
   min-height: 100px;
-  overflow: hidden;
 }
 
 .figure-container {
-    position: relative;
-    top: 0;
+  margin: 12px;
+  position: relative;
+  top: 0;
 }
 
 .imgs {
@@ -48,35 +56,22 @@
   position: relative;
   left: 0;
   top: 0;
-  margin-top: 6px;
-  margin-right: 6px;
-  z-index: 2;
-}
-
-#to-click {
-  cursor: pointer;
-  font-family: verdana;
-  width: 100%;
-  height: 100%;
-}
-
-#files {
-  display: none;
+  margin: 12px;
 }
 
 body {
-    background-color: #424242;
+  background-color: #424242;
 }
 
 h1 {
-    font-family: verdana;
-    color: #EFEFEF;
-    text-align: center;
+  font-family: verdana;
+  color: #EFEFEF;
+  text-align: center;
 }
 
 h6 {
-    font-family: verdana;
-    font-size: 20px;
-    color: #C1C1C1;
-    text-align: center;
+  font-family: verdana;
+  font-size: 20px;
+  color: #C1C1C1;
+  text-align: center;
 }
