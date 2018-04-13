@@ -39,12 +39,12 @@ cmap_names = [
     ]
 
 cm_names = [cat[1] for cat in cmap_names]
-values = np.linspace(0, 1, 256)
 
 print("var mpl_scales = {")
 
 for name in itertools.chain.from_iterable(cm_names):
     cmap = matplotlib.cm.get_cmap(name)
+    values = np.linspace(0, 1, cmap.N)
     rgba = cmap(values)
     hex = np.apply_along_axis(matplotlib.colors.rgb2hex, axis=1, arr=rgba)
     print('  "{}": {},\n'.format(name, json.dumps(hex.tolist())))
