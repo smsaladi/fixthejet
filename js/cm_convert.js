@@ -153,6 +153,7 @@ class ColormapLookup {
     }
     return labArr;
   }
+}
 
 /**
  * Simple Euclidean distance for 3 dimensions
