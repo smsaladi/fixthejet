@@ -108,10 +108,7 @@ class ColormapLookup {
       self.unmapped = false;
     };
 
-    if (fromMapName == 'jet') {
-      self.fromCm = self.createJetInLabSpace();
-    } else
-      self.fromCm = self.convertHexToLab(colorscales[fromMapName]);
+    self.fromCm = self.convertHexToLab(colorscales[fromMapName]);
     // self.kdt = createKDTree(self.fromCm);
     self.toCm = chroma.scale(colorscales[toMapName]);
 
@@ -155,47 +152,6 @@ class ColormapLookup {
       labArr[i] = chroma(arr[i]).lab();
     }
     return labArr;
-  }
-
-  /**
-   * Create an array of Jet values in the Lab colorspace
-   * 
-   *  UNUSED 
-   *
-   * @param {number} [bitDepth]
-   * @returns {number[number[]]}
-   */
-  createJetInLabSpace(bitDepth = 8) {
-    var jetInLab = new Array(Math.pow(2, bitDepth));
-
-    for (var i = 0; i < jetInLab.length; i++) {
-      var rgbJet = [0, 0, 0];
-      var iFrac = i / jetInLab.length;
-
-      // find the fractional R, G, B colors for each Jet value
-      if (iFrac < .125) {
-        rgbJet[2] = 0.5 + 4 * iFrac;
-      } else if (iFrac < 0.375) {
-        rgbJet[1] = -0.5 + 4 * iFrac;
-        rgbJet[2] = 1;
-      } else if (iFrac < 0.625) {
-        rgbJet[0] = -1.5 + 4 * iFrac;
-        rgbJet[1] = 1;
-        rgbJet[2] = 2.5 - 4 * iFrac;
-      } else if (iFrac < 0.875) {
-        rgbJet[0] = 1;
-        rgbJet[1] = 3.5 - 4 * iFrac;
-      } else {
-        rgbJet[0] = 4.5 - 4 * iFrac;
-      }
-
-      // Convert fractional values into ints of the given bitDepth
-      for (var j = 0; j < 3; j++)
-        rgbJet[j] = Math.round(rgbJet[j] * (jetInLab.length - 1));
-
-      jetInLab[i] = chroma(rgbJet).lab();
-    }
-    return jetInLab;
   }
 }
 
