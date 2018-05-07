@@ -47,6 +47,7 @@ function prepareCanvas(file) {
     reader.fileName = file.name;
     reader.onload = function(evt) {
         var canvas = document.createElement("canvas");
+        canvas.innerHTML = "Your browser doesn't support canvas";
         var image = new Image();
         image.src = evt.target.result;
         image.onload = function() {
