@@ -123,7 +123,7 @@ class ColormapLookup {
       }
 
       // var mappedValue = self.kdt.nn(chroma(value).lab(), self.maxDist);
-      var mappedValue = invertValue(chroma(value).lab(), self.fromCm); 
+      var mappedValue = invertValue(chroma(value).lab(), self.fromCm, self.maxDist); 
       return mappedValue / self.fromCm.length;
     };
 
