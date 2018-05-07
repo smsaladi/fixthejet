@@ -1,0 +1,28 @@
+{
+  "name": "fixthejet",
+  "version": "1.0.0",
+  "description": "README ======",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smsaladi/fixthejet.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/smsaladi/fixthejet/issues"
+  },
+  "homepage": "https://github.com/smsaladi/fixthejet#readme",
+  "dependencies": {
+    "static-kdtree": "^1.0.2"
+  },
+  "devDependencies": {
+    "eslint-config-google": "^0.9.1"
+  }
+}

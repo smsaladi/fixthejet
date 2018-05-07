@@ -109,7 +109,7 @@ class ColormapLookup {
     };
 
     self.fromCm = self.convertHexToLab(colorscales[fromMapName]);
-    // self.kdt = createKDTree(self.fromCm);
+    self.kdt = createKDTree(self.fromCm);
     self.toCm = chroma.scale(colorscales[toMapName]);
 
     /**
@@ -122,8 +122,7 @@ class ColormapLookup {
         return -1;
       }
 
-      // var mappedValue = self.kdt.nn(chroma(value).lab(), self.maxDist);
-      var mappedValue = invertValue(chroma(value).lab(), self.fromCm, self.maxDist); 
+      var mappedValue = self.kdt.nn(chroma(value).lab(), self.maxDist);
       return mappedValue / self.fromCm.length;
     };
 

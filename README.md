@@ -81,6 +81,23 @@ reimplement in JS
 * Tests, CI?
 
 
+## Building
+
+* Required npm are specified in `js/libs.js`
+
+* Browserify creates a single bundle of these with
+
+```shell
+browserify js/libs.js -o js/libs_bundle.js
+```
+
+* `js/libs_bundle.js` should be committed to the repo
+since the site is served through gh-pages
+
+* Make sure to commit `package-lock.json` and `package.json`
+as dependencies change
+
+
 ## Local testing
 
 Start a webserver from this folder and then navigate to the corresponding url:
