@@ -100,7 +100,7 @@ function convertCanvas(cvs, func) {
  * @returns {number} outcome of callable
  */
 class ColormapLookup {
-  constructor(fromMapName, toMapName, maxDist = 5) {
+  constructor(fromMapName, toMapName, maxDist = 1) {
     var self = this;
     self.maxDist = maxDist;
     self.unmapped = false;
@@ -172,10 +172,9 @@ function euclideanDist(a, b) {
  * Finds the value that gives rise to the given color within the original space
  * @param {number[]} value: outcome of original space
  * @param {number[][]} origValues: original space to match to
- * @param {number[][]} outOfScope: values to ignore
  * @returns {number} mapped value (fractional)
  */
-function invertValue(value, origValues) {
+function invertValue(value, origValues, maxDist) {
   // check that the pixel doesn't correspond more closely to black or white
   // presumably text on the page
   var outOfScope = [chroma([0, 0, 0]).lab(),         // black
@@ -192,6 +191,9 @@ function invertValue(value, origValues) {
   for (var i = 0; i < outOfScope.length; i++)
     if (euclideanDist(outOfScope[i], value) < lowestDistance)
       return -1;
+
+  if (lowestDistance > maxDist)
+    return -1;
 
   return lowestIndex;
 }
