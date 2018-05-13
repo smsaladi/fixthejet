@@ -96,11 +96,11 @@ function convertCanvas(cvs, func) {
  * Finds the value that gives rise to the given color within the original space
  * @param {number[]} value: color in RGB space
  * @param {number[][]} cm_kdt: original colormap as kd tree
- * @param {number[][]} maxDist: colors to ignore
+ * @param {number[][]} maxDist: largest valid distance for inverse mapping
  * @returns {number} outcome of callable
  */
 class ColormapLookup {
-  constructor(fromMapName, toMapName, maxDist = 1) {
+  constructor(fromMapName, toMapName, maxDist = 0.2 * 255) {
     var self = this;
     self.maxDist = maxDist;
     self.unmapped = false;
@@ -123,7 +123,7 @@ class ColormapLookup {
       }
 
       // var mappedValue = self.kdt.nn(chroma(value).lab(), self.maxDist);
-      var mappedValue = invertValue(chroma(value).lab(), self.fromCm, self.maxDist); 
+      var mappedValue = invertValue(chroma(value).rgb(), self.fromCm, self.maxDist); 
       return mappedValue / self.fromCm.length;
     };
 
@@ -149,7 +149,7 @@ class ColormapLookup {
   convertHexToLab(arr) {
     var labArr = new Array(arr.length);
     for (var i = 0; i < arr.length; i++) {
-      labArr[i] = chroma(arr[i]).lab();
+      labArr[i] = chroma(arr[i]).rgb();
     }
     return labArr;
   }
@@ -177,8 +177,8 @@ function euclideanDist(a, b) {
 function invertValue(value, origValues, maxDist) {
   // check that the pixel doesn't correspond more closely to black or white
   // presumably text on the page
-  var outOfScope = [chroma([0, 0, 0]).lab(),         // black
-                    chroma([255, 255, 255]).lab()];   // white
+  var outOfScope = [chroma([0, 0, 0]).rgb(),         // black
+                    chroma([255, 255, 255]).rgb()];   // white
 
   var lowestIndex = 0;
   var lowestDistance = euclideanDist(value, origValues[lowestIndex]);
